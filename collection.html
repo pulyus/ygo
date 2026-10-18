@@ -1,0 +1,2302 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta
+      name="description"
+      content="Card collection manager: keep any number of named groups of cards, with any number of copies, and save the whole collection as one code."
+    />
+    <link rel="icon" type="image/x-icon" href="images/logo.png" />
+    <title>DLF2P Collection</title>
+    <style>
+      /* ===== colour scheme "Indigo": the same as editor.html, plus the few additions marked NEW ===== */
+      :root {
+        --page-bg: #07060c;
+        --text: #dee0f7;
+        --text-muted: #98a1ec;
+        --frame-border: #8672cb;
+        --panel-bg: #0e0b1e;
+        --panel-border: #8672cb;
+        --input-bg: #2a2e54;
+        --input-text: #dee0f7;
+        --btn-bg: #2a2e54;
+        --btn-border: #4a50be;
+        --btn-text: #dee0f7;
+        --highlight-bg: #4474c9;
+        --highlight-border: #93e3fa;
+        --highlight-text: #cfeaff;
+        --highlight-glow: #2f58c2cc;
+        --popup-bg: #07060cf0;
+        --scroll-track: #0c0c24;
+        --scroll-thumb: #34358f;
+        --note-text: #93e3fa;
+        --overlay-bg: #07060c99;
+        /* NEW */
+        --danger: #ff8a96;
+        --danger-bg: #5a2233;
+        --drop-glow: #93e3facc;
+        --badge-bg: #14163a;
+      }
+      /* Barlow (SIL Open Font License, see fonts/OFL.txt), bundled so every system shows the same font */
+      @font-face {
+        font-family: "Barlow";
+        font-style: normal;
+        font-weight: 300;
+        font-display: swap;
+        src: url("fonts/barlow-latin-300-normal.woff2") format("woff2");
+        unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+      }
+      @font-face {
+        font-family: "Barlow";
+        font-style: normal;
+        font-weight: 300;
+        font-display: swap;
+        src: url("fonts/barlow-latin-ext-300-normal.woff2") format("woff2");
+        unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
+      }
+      @font-face {
+        font-family: "Barlow";
+        font-style: normal;
+        font-weight: 400;
+        font-display: swap;
+        src: url("fonts/barlow-latin-400-normal.woff2") format("woff2");
+        unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+      }
+      @font-face {
+        font-family: "Barlow";
+        font-style: normal;
+        font-weight: 400;
+        font-display: swap;
+        src: url("fonts/barlow-latin-ext-400-normal.woff2") format("woff2");
+        unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
+      }
+      @font-face {
+        font-family: "Barlow";
+        font-style: normal;
+        font-weight: 500;
+        font-display: swap;
+        src: url("fonts/barlow-latin-500-normal.woff2") format("woff2");
+        unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+      }
+      @font-face {
+        font-family: "Barlow";
+        font-style: normal;
+        font-weight: 500;
+        font-display: swap;
+        src: url("fonts/barlow-latin-ext-500-normal.woff2") format("woff2");
+        unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
+      }
+      @font-face {
+        font-family: "Barlow Semi Condensed";
+        font-style: normal;
+        font-weight: 400;
+        font-display: swap;
+        src: url("fonts/barlow-semi-condensed-latin-400-normal.woff2") format("woff2");
+        unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+      }
+      @font-face {
+        font-family: "Barlow Semi Condensed";
+        font-style: normal;
+        font-weight: 400;
+        font-display: swap;
+        src: url("fonts/barlow-semi-condensed-latin-ext-400-normal.woff2") format("woff2");
+        unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
+      }
+      * {
+        padding: 0;
+        margin: 0;
+      }
+      :root {
+        --font: "Barlow", "Bahnschrift", "Segoe UI", Roboto, -apple-system, BlinkMacSystemFont, "Helvetica Neue", Arial, sans-serif;
+        --cw: 4.3vw; /* card width (editor.html: window.innerWidth * 0.043) */
+        --H: calc(100vh - 44px); /* height the page can use */
+      }
+      body {
+        background-color: var(--page-bg);
+        min-height: 100vh;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        box-sizing: border-box;
+        padding: 12px 0;
+        font-family: var(--font);
+        font-weight: lighter;
+        font-size: 1.7vw;
+        color: var(--text);
+        touch-action: manipulation;
+      }
+      #tabs { display: none; }
+      #body {
+        display: flex;
+        border-width: max(0.14vw, 2px);
+        border-color: var(--frame-border);
+        border-style: solid;
+      }
+      #body > div { margin: 10px; }
+      .purple {
+        background-color: var(--panel-bg);
+        border-width: max(0.28vw, 2px);
+        border-color: var(--panel-border);
+        border-style: solid;
+      }
+      input {
+        padding: 0.35vw;
+        font-size: 1.74vw;
+        font-family: var(--font);
+        font-weight: lighter;
+        color: var(--input-text);
+        background-color: var(--input-bg);
+        border: none;
+        width: 21vw;
+        margin-bottom: 1vh;
+      }
+      button {
+        width: 13.9vw;
+        height: 6.48vh;
+        background-color: var(--btn-bg);
+        font-family: var(--font);
+        font-weight: lighter;
+        font-size: 1.4vw;
+        color: var(--btn-text);
+        border-width: max(0.28vw, 2px);
+        border-color: var(--btn-border);
+        border-style: solid;
+        cursor: pointer;
+        padding: 0;
+        outline: none;
+        margin-bottom: 1vh;
+        transition: background-color 0.25s ease, border-color 0.25s ease, color 0.25s ease, box-shadow 0.25s ease;
+      }
+      button:hover,
+      button.selected {
+        background-color: var(--highlight-bg);
+        border-color: var(--highlight-border);
+        color: var(--highlight-text);
+        box-shadow: 0 0 max(0.7vw, 6px) var(--highlight-glow);
+      }
+      button:focus-visible { border-color: var(--highlight-border); }
+      button:disabled { opacity: 0.4; cursor: default; pointer-events: none; }
+      input::placeholder { color: var(--text-muted); opacity: 1; }
+      input:focus { outline: max(0.14vw, 2px) solid var(--highlight-border); outline-offset: 0; }
+      #groupList, #groupCards, #searchResult, #popup { scrollbar-color: var(--scroll-thumb) var(--scroll-track); }
+      ::-webkit-scrollbar { width: max(0.6vw, 8px); height: max(0.6vw, 8px); }
+      ::-webkit-scrollbar-track { background: var(--scroll-track); }
+      ::-webkit-scrollbar-thumb { background: var(--scroll-thumb); }
+      ::-webkit-scrollbar-corner { background: var(--scroll-track); }
+      @media (prefers-reduced-motion: reduce) { button { transition: none; } }
+      .minibtn { width: 10.4vw; height: 5.2vh; font-size: 1vw; border-width: max(0.2vw, 2px); }
+      .filterbtn { width: 6.9vw; height: 5.2vh; font-size: 1vw; border-width: max(0.2vw, 2px); }
+      img { user-select: none; -webkit-user-select: none; -webkit-touch-callout: none; }
+      .muted { color: var(--text-muted); }
+
+      /* ===== columns: groups | the open group | card search ===== */
+      #groupsCol { width: 16.5vw; }
+      #deck { width: calc(8 * var(--cw) + 18px + 1.4vw + 0.56vw); }
+      #controls { width: calc(6 * var(--cw) + 18px + 1.4vw + 0.56vw); }
+      #groupsCol input { width: 100%; box-sizing: border-box; font-size: 1.2vw; padding: 0.25vw 0.35vw; }
+      #collectionName { margin-bottom: 0.9vh; }
+      .colhead { display: flex; justify-content: space-between; align-items: center; font-size: 1.4vw; margin-bottom: 0.4vh; height: 3.6vh; }
+      .chip { font-size: 1vw; padding: 0.05vw 0.6vw; background: var(--btn-bg); border: max(0.14vw, 1px) solid var(--btn-border); }
+      #groupsCol button.wide { width: 100%; box-sizing: border-box; }
+      #groupList { height: calc(var(--H) * 0.36); overflow-y: scroll; padding: 0.45vw; margin-bottom: 0.8vh; }
+      .group-row {
+        display: flex;
+        align-items: center;
+        gap: 0.45vw;
+        padding: 0.5vw;
+        margin-bottom: 0.35vw;
+        background: var(--input-bg);
+        border: max(0.14vw, 1px) solid transparent;
+        font-size: 1.2vw;
+        cursor: pointer;
+        user-select: none;
+        -webkit-user-select: none;
+        transition: background-color 0.25s ease, border-color 0.25s ease, color 0.25s ease, box-shadow 0.25s ease;
+      }
+      .group-row .grip { color: var(--text-muted); cursor: grab; font-size: 1vw; letter-spacing: -0.25vw; touch-action: none; padding: 0 0.2vw; }
+      .group-row .gname { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+      .group-row .gcount { color: var(--text-muted); font-size: 1vw; }
+      .group-row:hover { border-color: var(--btn-border); }
+      .group-row.active { background: var(--highlight-bg); border-color: var(--highlight-border); color: var(--highlight-text); box-shadow: 0 0 max(0.7vw, 6px) var(--highlight-glow); }
+      .group-row.active .grip, .group-row.active .gcount { color: var(--highlight-text); }
+      .group-row.empty .gname { color: var(--text-muted); font-style: italic; }
+      .group-row.drop { border-color: var(--highlight-border); box-shadow: 0 0 max(0.9vw, 8px) var(--drop-glow); background: #2f3f86; }
+      .group-row.before { box-shadow: 0 -0.3vw 0 var(--highlight-border); }
+      .group-row.after { box-shadow: 0 0.3vw 0 var(--highlight-border); }
+      .group-row.moving { opacity: 0.45; }
+      .emptynote { width: 100%; padding: 1vw; font-size: 1.05vw; color: var(--text-muted); line-height: 1.4; text-align: center; }
+      .grouptools { display: flex; gap: 0.3vw; margin-bottom: 0.6vh; }
+      .grouptools button { flex: 1; width: auto; height: 4.4vh; font-size: 0.95vw; margin-bottom: 0; border-width: max(0.14vw, 2px); }
+      .grouptools button.del:hover { border-color: var(--danger); color: var(--danger); background: var(--danger-bg); box-shadow: none; }
+      .sectionlabel { font-size: 1vw; color: var(--text-muted); margin-bottom: 0.6vh; letter-spacing: 0.05vw; text-transform: uppercase; }
+
+      #deck .toolbar { white-space: nowrap; }
+      #groupName { width: 28vw; box-sizing: border-box; }
+      #groupCards, #searchResult { overflow-y: scroll; padding: 0.7vw; box-sizing: content-box; display: flex; flex-wrap: wrap; align-content: flex-start; }
+      #groupCards { width: calc(8 * var(--cw) + 18px); height: calc(var(--H) * 0.7 + 3.1vh); }
+      #searchResult { width: calc(6 * var(--cw) + 18px); height: calc(var(--H) * 0.7 + 3.1vh); margin-bottom: 1.3vh; }
+      #groupCards.dropbox { border-color: var(--highlight-border); }
+
+      /* ===== cards ===== */
+      .cell { position: relative; width: var(--cw); flex: 0 0 auto; cursor: pointer; user-select: none; -webkit-user-select: none; -webkit-touch-callout: none; }
+      .cell img.cimg { display: block; width: 100%; aspect-ratio: 59 / 86; background: var(--input-bg); transition: filter 0.5s ease-out; object-fit: cover; }
+      .cell.lifted img.cimg { opacity: 0.3; }
+      .qty, .owned {
+        position: absolute;
+        bottom: 0.25vw;
+        padding: 0.05vw 0.35vw;
+        box-sizing: border-box;
+        min-width: 1.5vw;
+        text-align: center;
+        font-size: 0.95vw;
+        font-weight: 500;
+        color: var(--highlight-text);
+        background: var(--badge-bg);
+        border: max(0.1vw, 1px) solid var(--highlight-border);
+        pointer-events: none;
+      }
+      .qty { right: 0.25vw; }
+      .owned { left: 0.25vw; color: var(--note-text); border-color: var(--btn-border); }
+
+      /* ===== popups ===== */
+      #popupCss1 { width: 100vw; height: 100vh; margin: 0; padding: 0; z-index: 9999; position: fixed; top: 0; left: 0; display: none; justify-content: center; }
+      #popupCss2 { height: 100vh; display: flex; flex-direction: column; justify-content: center; }
+      #popup { width: 55.6vw; height: 80vh; overflow: auto; background-color: var(--popup-bg); padding: 1.4vw; font-size: 1vw; position: relative; box-sizing: border-box; }
+      #popup p { margin-top: 2vh; }
+      #popup .cardname { font-size: 1.4vw; text-align: center; }
+      #popup .carddesc { white-space: pre-line; }
+      #popup .infoimg { display: flex; justify-content: center; }
+      #popup .infoimg img { width: 160px; aspect-ratio: 59 / 86; background: var(--input-bg); }
+      #popup h3 { font-size: 1.2vw; font-weight: 500; margin: 3vh 0 1vh; }
+      .foundlist { width: 100%; border-collapse: collapse; font-size: 1.05vw; }
+      .foundlist td { padding: 0.45vw 0.7vw; background: var(--input-bg); border-bottom: max(0.14vw, 2px) solid var(--panel-bg); cursor: pointer; }
+      .foundlist td.n { text-align: right; width: 4vw; }
+      .foundlist tr.here td { background: var(--highlight-bg); color: var(--highlight-text); }
+      .filterheader { font-size: 1.7vw; margin: 2vh 0 0.7vw; }
+      #popup .filterbtns button { width: 10.4vw; height: 5.2vh; font-size: 1vw; border-width: max(0.2vw, 2px); }
+      #popup .filterfoot { position: sticky; bottom: 10px; text-align: end; margin-top: 2vh; }
+      #popup .filterfoot button { width: 13.9vw; height: 6.48vh; font-size: 1.4vw; border-width: max(0.28vw, 2px); margin-left: 0.5vw; background-color: var(--btn-bg); }
+      #popup .filterfoot button:hover { background-color: var(--highlight-bg); }
+      #exportLayer { position: fixed; inset: 0; z-index: 10000; display: none; justify-content: center; align-items: center; background-color: var(--overlay-bg); }
+      #exportLayer.open { display: flex; }
+      #exportBox { width: min(30vw, 92vw); max-height: 90vh; overflow-y: auto; padding: 1.2vw; background-color: var(--popup-bg); border: max(0.28vw, 2px) solid var(--panel-border); font-size: 1vw; }
+      #exportTitle { margin: 0 0 0.8vw; font-size: 1.4vw; }
+      #exportBox button.export-option { display: block; width: 100%; height: auto; margin: 0 0 0.6vw; padding: 0.6vw 0.8vw; text-align: left; font-size: 1.2vw; box-sizing: border-box; }
+      #exportBox .export-desc { display: block; margin-top: 0.2vw; font-size: 0.9vw; color: var(--text-muted); }
+      #exportBox button.export-option:hover .export-desc, #exportBox button.export-option.selected .export-desc { color: var(--highlight-text); }
+      #exportBox .export-note { display: block; margin-top: 0.2vw; font-size: 0.9vw; color: var(--note-text); }
+      #exportBox button.export-option:hover .export-note, #exportBox button.export-option.selected .export-note { color: var(--highlight-text); }
+      #exportBox textarea { display: block; width: 100%; height: 10vw; margin: 0 0 0.6vw; padding: 0.5vw; box-sizing: border-box; resize: vertical; font-family: var(--font); font-size: 1vw; color: var(--input-text); background-color: var(--input-bg); border: none; }
+      #exportBox textarea:focus { outline: max(0.14vw, 2px) solid var(--highlight-border); }
+      #exportBox .export-hint { margin: 0 0 0.8vw; font-size: 1vw; color: var(--text-muted); line-height: 1.35; }
+      #exportBox .export-hint b { font-weight: 500; color: var(--text); }
+      .seg { display: flex; margin: 0 0 0.8vw; }
+      .seg button { flex: 1; width: auto; height: 4.6vh; margin: 0; font-size: 1vw; border-width: max(0.2vw, 2px); }
+      .seg button + button { margin-left: -0.2vw; }
+      .seg button:disabled { opacity: 0.4; cursor: default; pointer-events: none; }
+      .importlist { max-height: 14vh; overflow-y: auto; margin: 0 0 0.8vw; padding: 0.4vw; background: var(--panel-bg); border: max(0.2vw, 2px) solid var(--panel-border); scrollbar-color: var(--scroll-thumb) var(--scroll-track); }
+      .importlist div { display: flex; justify-content: space-between; gap: 1vw; padding: 0.25vw 0.4vw; font-size: 1vw; }
+      #exportBox button.export-option.danger { border-color: var(--danger); }
+      #exportBox button.export-option.danger:hover { background: var(--danger-bg); color: var(--danger); box-shadow: none; }
+      #exportBox button.export-option.danger:hover .export-desc { color: var(--danger); }
+
+      /* ===== dragging a card, right-click menu ===== */
+      #ghost { position: fixed; z-index: 9000; display: none; pointer-events: none; filter: drop-shadow(0 0.5vw 0.6vw #000a); }
+      #ghost img { display: block; width: 100%; }
+      #dropTip { position: fixed; z-index: 9001; display: none; padding: 0.4vw 0.8vw; font-size: 1vw; white-space: nowrap; pointer-events: none; background: var(--popup-bg); border: max(0.14vw, 2px) solid var(--highlight-border); color: var(--highlight-text); }
+      #dropTip span { color: var(--text-muted); }
+      body.dragging, body.dragging * { cursor: grabbing !important; }
+      #menu { position: fixed; z-index: 10001; display: none; min-width: 11vw; background: var(--popup-bg); border: max(0.2vw, 2px) solid var(--panel-border); padding: 0.3vw; }
+      #menu button { display: block; width: 100%; height: auto; margin: 0 0 0.2vw; padding: 0.5vw 0.8vw; font-size: 1.1vw; text-align: left; border-width: max(0.14vw, 1px); }
+      #menu button:last-child { margin-bottom: 0; }
+      #menu button.del:hover { border-color: var(--danger); color: var(--danger); background: var(--danger-bg); box-shadow: none; }
+
+      /* ===== phones: one column at a time, chosen with the tabs ===== */
+      @media (max-aspect-ratio: 1/1) {
+        :root { --cw: 15vw; }
+        body { display: block; font-size: 4vw; font-weight: 500; padding: 17vw 0 4vw; } /* top room for the site menu icon */
+        #tabs { display: flex; gap: 1.5vw; padding: 0 3vw 2.5vw; }
+        #tabs button { flex: 1; width: auto; height: 10vw; margin: 0; font-size: 3.8vw; font-weight: 500; border-width: 2px; }
+        #body { display: block; border: none; }
+        #body > div { display: none; margin: 0 3vw; width: auto; }
+        body.scr-groups #groupsCol, body.scr-cards #deck, body.scr-search #controls { display: block; }
+        input { width: 100%; box-sizing: border-box; font-size: 4vw; padding: 1.8vw; margin-bottom: 2vw; }
+        button { width: 100%; height: 10vw; font-size: 4vw; font-weight: 500; margin-bottom: 2vw; border-width: 2px; }
+        .minibtn { width: calc(33.3% - 1.4vw); height: 9vw; font-size: 3.4vw; border-width: 2px; }
+        .filterbtn { width: 22vw; height: 10vw; font-size: 3.4vw; border-width: 2px; }
+        #groupsCol input { font-size: 4vw; padding: 1.8vw; }
+        .colhead { font-size: 4.6vw; height: 9vw; margin-bottom: 1vw; }
+        .chip { font-size: 3.4vw; padding: 0.3vw 2vw; }
+        #groupList { height: 52vh; padding: 1.5vw; margin-bottom: 2vw; }
+        .group-row { font-size: 4.2vw; padding: 2.6vw 2vw; gap: 2vw; margin-bottom: 1.5vw; }
+        .group-row .grip { font-size: 4vw; letter-spacing: -1vw; padding: 0 2vw; }
+        .group-row .gcount { font-size: 3.4vw; }
+        .grouptools { gap: 1.5vw; margin-bottom: 2vw; }
+        .grouptools button { height: 9vw; font-size: 3.4vw; border-width: 2px; }
+        .sectionlabel { font-size: 3.2vw; margin-bottom: 1.5vw; }
+        .emptynote { font-size: 3.6vw; padding: 4vw; }
+        #groupName { width: calc(100% - 24vw); }
+        #deck .toolbar { white-space: normal; }
+        #groupCards, #searchResult { width: auto; box-sizing: border-box; padding: 1vw; height: 62vh; overflow-y: auto; margin-bottom: 2vw; }
+        .qty, .owned { font-size: 3vw; min-width: 5vw; padding: 0 1vw; bottom: 0.8vw; }
+        .qty { right: 0.8vw; }
+        .owned { left: 0.8vw; }
+        #popup { width: 95vw; font-size: 3.5vw; padding: 3vw; }
+        #popup .cardname { font-size: 4.2vw; }
+        #popup .infoimg img { width: 33vw; }
+        #popup h3 { font-size: 4vw; }
+        .foundlist { font-size: 3.6vw; }
+        .foundlist td { padding: 2vw; }
+        .foundlist td.n { width: 14vw; }
+        .filterheader { font-size: 4.2vw; margin: 3vw 0 2vw; }
+        #popup .filterbtns button { width: 30vw; height: 8vw; font-size: 3.2vw; border-width: 2px; }
+        #popup .filterfoot button { width: 40vw; height: 10vw; font-size: 4vw; border-width: 2px; }
+        #exportBox { width: 92vw; padding: 4vw; font-size: 3.5vw; }
+        #exportTitle { font-size: 4.5vw; margin-bottom: 3vw; }
+        #exportBox button.export-option { font-size: 4.2vw; padding: 2.5vw 3vw; margin-bottom: 2.5vw; }
+        #exportBox .export-desc, #exportBox .export-note { font-size: 3.3vw; }
+        #exportBox textarea { height: 35vw; font-size: 3.5vw; padding: 2vw; }
+        #exportBox .export-hint { font-size: 3.3vw; }
+        .seg button { height: 10vw; font-size: 3.4vw; }
+        .importlist { max-height: 22vh; }
+        .importlist div { font-size: 3.4vw; }
+        #dropTip { font-size: 3.4vw; }
+        #menu { min-width: 40vw; }
+        #menu button { font-size: 4vw; padding: 2.5vw 3vw; margin-bottom: 1vw; }
+      }
+    </style>
+  </head>
+  <body class="scr-groups">
+    <div id="popupCss1">
+      <div id="popupCss2">
+        <div id="popup"></div>
+      </div>
+    </div>
+
+    <!-- phones: switch between the three columns -->
+    <div id="tabs">
+      <button data-screen="groups">Groups</button>
+      <button data-screen="cards">Cards</button>
+      <button data-screen="search">Search</button>
+    </div>
+
+    <div id="body">
+      <!-- column 1: the collection and its groups -->
+      <div id="groupsCol">
+        <input id="collectionName" type="text" placeholder="Collection name..." autocomplete="off" maxlength="60" />
+        <div class="colhead"><span>Groups</span><span class="chip" id="groupCountChip">0</span></div>
+        <button class="minibtn wide" id="btnNewGroup">+ New Group</button>
+        <input id="groupFilter" type="text" placeholder="Filter groups..." autocomplete="off" />
+        <div id="groupList" class="purple"></div>
+        <div class="grouptools">
+          <button id="btnRename">Rename</button>
+          <button id="btnDuplicate">Duplicate</button>
+          <button id="btnDelete" class="del">Delete</button>
+        </div>
+        <div class="sectionlabel">Whole collection</div>
+        <button class="minibtn wide" id="copyDeck">Copy</button>
+        <button class="minibtn wide" id="download">Download</button>
+        <button class="minibtn wide" id="upload">Upload</button>
+        <input id="uploadInput" type="file" accept=".ylcc,.yld,.ydk,.txt" style="display: none" />
+      </div>
+
+      <!-- column 2: the open group -->
+      <div id="deck">
+        <div class="toolbar">
+          <button class="minibtn" id="btnSort">Sort Group</button>
+          <button class="minibtn" id="btnStack">View: Stacked</button>
+          <button class="minibtn" id="btnClear">Clear Group</button>
+        </div>
+        <input id="groupName" type="text" placeholder="Group name..." autocomplete="off" maxlength="40" />
+        <button class="filterbtn" id="btnMode">Mode: View</button>
+        <div id="groupCards" class="purple"></div>
+      </div>
+
+      <!-- column 3: card search -->
+      <div id="controls">
+        <input id="searchInput" type="text" placeholder="Search card..." autocomplete="off" />
+        <button class="filterbtn" id="btnOptions">Options</button>
+        <div id="searchResult" class="purple"></div>
+      </div>
+    </div>
+
+    <div id="ghost"></div>
+    <div id="dropTip"></div>
+    <div id="menu"></div>
+
+    <div id="exportLayer">
+      <div id="exportBox" tabindex="-1" role="dialog" aria-modal="true" aria-labelledby="exportTitle">
+        <p id="exportTitle"></p>
+        <div id="exportOptions"></div>
+      </div>
+    </div>
+  </body>
+  <script>
+    //=== YgolDeck: single deck format conversion (yld / ydk / ydke / dlf2pV2), as in editor.html ===
+    class YgolDeck {
+      constructor(db, ygolID, isRush) {
+        this.db = db;
+        this.ygolID = ygolID;
+        this.isRush = isRush;
+        //cards skipped by the last convert() because they aren't in the database
+        this.missing = [];
+        //skill index (into skillDb) read by the last convert() from a yld code, or null
+        this.skill = null;
+      }
+      hasCard(name) {
+        if (!this.dbNames) this.dbNames = new Set(this.db.map((a) => a.name));
+        return this.dbNames.has(name);
+      }
+      //find a card by passcode: its main passcode first, then the passcodes of its other arts
+      findByPasscode(id) {
+        id = Number(id);
+        return (
+          this.db.find((a) => a.konamiID == id) ||
+          this.db.find(
+            (a) => a.altKonamiIDs && a.altKonamiIDs.some((alt) => Number(alt) == id)
+          )
+        );
+      }
+      //skill: optional skill index (into skillDb), only stored by the yld format
+      convert(d, format, skill = null) {
+        this.missing = [];
+        this.skill = null;
+        switch (format) {
+          case "yld":
+            return this.namelist_to_yld(this.toNamelist(d), skill);
+          case "ydk":
+            return this.namelist_to_ydk(this.toNamelist(d));
+          case "ydke":
+            return this.ydk_to_ydke(this.namelist_to_ydk(this.toNamelist(d)));
+          case "dlf2pV2":
+            return this.namelist_to_dlf2pV2(this.toNamelist(d));
+          case "namelist":
+            return this.toNamelist(d);
+        }
+      }
+      toNamelist(d) {
+        if (d.includes("#main") || d.includes("#extra")) {
+          return this.ydk_to_namelist(d);
+        } else if (d.includes("ydke://")) {
+          return this.ydk_to_namelist(this.ydke_to_ydk(d));
+        } else if (d.includes("yld://")) {
+          return this.yld_to_namelist(d);
+        } else if (d.slice(0, 2) == "3_") {
+          //dlf2pv3
+        } else {
+          return this.dlf2pV2_to_namelist(d);
+        }
+      }
+      isEDMonster(name) {
+        let card = this.db.filter((a) => a.name == name)[0];
+        if (!card) return false;
+        return (
+          card.monsterType.includes("Fusion") ||
+          card.monsterType.includes("Synchro") ||
+          card.monsterType.includes("Xyz") ||
+          card.monsterType.includes("XYZ") ||
+          card.monsterType.includes("Link")
+        );
+      }
+      ydk_to_ydke(ydk) {
+        function Uint32Array_to_ydke(main, extra, side) {
+          function passcodesToBase64(passcodes) {
+            const bytes = new Uint8Array(passcodes.buffer);
+            let binaryString = "";
+            for (let i = 0; i < bytes.length; i++) {
+              binaryString += String.fromCharCode(bytes[i]);
+            }
+            return btoa(binaryString);
+          }
+          return (
+            "ydke://" +
+            passcodesToBase64(main) +
+            "!" +
+            passcodesToBase64(extra) +
+            "!" +
+            passcodesToBase64(side) +
+            "!"
+          );
+        }
+        function stringsToUint32Array(stringsArray) {
+          const uint32Array = new Uint32Array(stringsArray.length);
+          for (let i = 0; i < stringsArray.length; i++)
+            uint32Array[i] = parseInt(stringsArray[i], 10);
+          return uint32Array;
+        }
+        let main = ydk
+          .split("#main")[1]
+          .split("#extra")[0]
+          .split("\n")
+          .filter((a) => a != "");
+        let extra = ydk
+          .split("#extra")[1]
+          .split("!side")[0]
+          .split("\n")
+          .filter((a) => a != "");
+        let side = ydk
+          .split("!side")[1]
+          .split("\n")
+          .filter((a) => a != "");
+        return Uint32Array_to_ydke(
+          stringsToUint32Array(main),
+          stringsToUint32Array(extra),
+          stringsToUint32Array(side)
+        );
+      }
+      ydke_to_ydk(ydke) {
+        function ydke_to_Uint32Array(ydke) {
+          function base64ToPasscodes(base64) {
+            const binaryString = atob(base64);
+            const bytes = new Uint8Array(binaryString.length);
+            for (let i = 0; i < binaryString.length; i++) {
+              bytes[i] = binaryString.charCodeAt(i);
+            }
+            return new Uint32Array(bytes.buffer);
+          }
+          const components = ydke.slice("ydke://".length).split("!");
+          return {
+            main: base64ToPasscodes(components[0]),
+            extra: base64ToPasscodes(components[1]),
+            side: base64ToPasscodes(components[2]),
+          };
+        }
+        return JSON.stringify(ydke_to_Uint32Array(ydke))
+          .replace('"main"', "#main")
+          .replace('"extra"', "#extra")
+          .replace('"side"', "!side")
+          .replace(/{/g, "")
+          .replace(/}/g, "")
+          .replace(/:/g, ",")
+          .split(",")
+          .filter((a) => !a.includes('"'))
+          .join("\n");
+      }
+      ydk_to_namelist(ydk) {
+        let arr = ydk.split("\n").filter((a) => a != "");
+        for (let i = 0; i < arr.length; i++) {
+          if (arr[i][0] != "#" && arr[i][0] != "!") {
+            if (isNaN(arr[i])) {
+              return ydk;
+            } else {
+              let found = this.findByPasscode(arr[i]);
+              let card = found ? [found] : [];
+              if (card.length) {
+                arr[i] = card[0].name;
+              } else {
+                card = this.db.filter(
+                  (a) =>
+                    a.konamiID == Number(arr[i]) + 1 ||
+                    a.konamiID == Number(arr[i]) - 1
+                );
+                if (!card.length) this.missing.push(`Unknown card (ID ${arr[i]})`);
+                arr[i] = card.length ? card[0].name : "";
+              }
+            }
+          }
+        }
+        return arr.filter((a) => a != "").join("\n");
+      }
+      namelist_to_ydk(namelist) {
+        let arr = namelist.split("\n");
+        for (let i = 0; i < arr.length; i++) {
+          let card = this.db.filter(
+            (a) => a.name == arr[i] && (this.isRush ? a.rush : !a.rush)
+          );
+          if (card.length) arr[i] = card[0].konamiID || arr[i];
+        }
+        if (!namelist.includes("!side")) arr.push("!side");
+        return arr.join("\n");
+      }
+      //yld code: "1" + main + "c" + extra + "c" + side + "c" + skill index, in base 13, then base 64.
+      //cards are 5-digit ygolID indexes, "a"/"b" repeat the previous card once/twice.
+      //every section after main is optional, so older codes (no side deck, no skill) still decode.
+      yld_to_namelist(yld) {
+        let raw = this.base13Encode(this.base64Decode(yld.replace("yld://", ""))).slice(1);
+        let sections = raw.split("c");
+        if (sections.length > 4) throw new Error("Invalid yld deck code");
+        const headers = ["#main", "#extra", "!side"];
+        let d = "";
+        let prev = 0;
+        for (let s = 0; s < Math.min(sections.length, 3); s++) {
+          d += headers[s] + "\n";
+          let chunks =
+            sections[s]
+              .replace(/a/g, "xxxxx")
+              .replace(/b/g, "xxxxxxxxxx")
+              .match(/.{1,5}/g) || [];
+          for (let el of chunks) {
+            //a chunk that isn't a 5-digit id means the code itself is corrupted
+            if (el != "xxxxx" && !/^\d{5}$/.test(el))
+              throw new Error("Invalid yld deck code");
+            let idx = el == "xxxxx" ? prev : Number(el);
+            let name = this.ygolID[idx];
+            if (name !== undefined && this.hasCard(name)) {
+              d += name + "\n";
+            } else {
+              //skip cards that aren't in the database instead of failing
+              this.missing.push(name !== undefined ? name : `Unknown card (ID ${idx})`);
+            }
+            if (el != "xxxxx") prev = Number(el);
+          }
+        }
+        //4th section: the set skill
+        if (sections.length == 4 && sections[3] !== "") {
+          if (!/^\d+$/.test(sections[3])) throw new Error("Invalid yld deck code");
+          this.skill = Number(sections[3]);
+        }
+        return d;
+      }
+      namelist_to_yld(namelist, skill = null) {
+        let d = "1";
+        let prev = "";
+        for (let el of namelist.split("\n")) {
+          if (el.includes("#extra") || el.includes("!side")) {
+            d += "c";
+          } else if (this.ygolID.indexOf(el) != -1) {
+            let curr = ("0000" + this.ygolID.indexOf(el)).slice(-5);
+            d += prev == curr ? "a" : curr;
+            prev = curr;
+            d = d.replace("aa", "b");
+          }
+        }
+        //the skill goes after the side deck, so add any missing extra/side separators first
+        if (Number.isInteger(skill) && skill >= 0) {
+          for (let seps = (d.match(/c/g) || []).length; seps < 2; seps++) d += "c";
+          d += "c" + skill;
+        }
+        return "yld://" + this.base64Encode(this.base13Decode(d));
+      }
+      dlf2pV2_to_namelist(dlf2pV2) {
+        let c = dlf2pV2.split("_")[0] == "2" ? dlf2pV2.slice(2) : dlf2pV2;
+        let split = decodeURIComponent(c).split("_");
+        let arr = this.base13Encode(this.base63Decode(split[0]));
+        if (arr[0] != "a") arr = "0" + arr;
+        arr = arr
+          .replace(/a/g, "00")
+          .replace(/c/g, "bb")
+          .replace(/b/g, "xxxxxxxxxx")
+          .match(/.{1,10}/g);
+        let d = [];
+        let prev = null; //last decoded card, null if it was skipped
+        for (let el of arr) {
+          if (el != "xxxxxxxxxx") {
+            let card = this.findByPasscode(el);
+            prev = card ? card.name : null;
+            if (!card) this.missing.push(`Unknown card (ID ${Number(el)})`);
+          } else if (prev === null) {
+            this.missing.push(this.missing.at(-1) || "Unknown card");
+          }
+          //skip cards that aren't in the database instead of failing
+          if (prev !== null) d.push(prev);
+        }
+        let main = d.filter((a) => !this.isEDMonster(a));
+        let extra = d.filter((a) => this.isEDMonster(a));
+        if (split[3])
+          for (let el of split[3].split("-")) {
+            if (!this.hasCard(el)) {
+              this.missing.push(el);
+            } else if (this.isEDMonster(el)) {
+              extra.push(el);
+            } else {
+              main.push(el);
+            }
+          }
+        return `#main\n${main.join("\n")}\n#extra\n${extra.join("\n")}`;
+      }
+      namelist_to_dlf2pV2(namelist) {
+        let darr = [];
+        let special = [];
+        let prev = "";
+        for (let el of namelist.split("\n")) {
+          if (el.includes("!side")) break;
+          if (!el.includes("#main") && !el.includes("#extra")) {
+            let card = this.db.filter((a) => a.name == el)[0];
+            if (card.konamiID) {
+              let id = ("000000000" + card.konamiID).slice(-10);
+              darr.push(id == prev ? "b" : id);
+              prev = id;
+            } else {
+              special.push(el);
+            }
+          }
+        }
+        return `${this.base63Encode(
+          this.base13Decode(darr.join("").replace(/bb/g, "c").replace(/00/g, "a"))
+        )}_-1_Deck${special.length ? `_${special.join("-")}` : ""}`;
+      }
+      base64Encode(str) {
+        if (str == "-1") return "-1";
+        let input = BigInt(str);
+        let chars =
+          "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-_";
+        let result = "";
+        while (input > 0n) {
+          result = chars[input - (input / 64n) * 64n] + result;
+          input = BigInt(input / 64n);
+        }
+        return result;
+      }
+      base64Decode(str) {
+        if (str == "-1") return "-1";
+        let result = 0n;
+        let chars =
+          "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-_";
+        for (let i = str.length - 1; i >= 0; i--) {
+          result +=
+            BigInt(chars.indexOf(str[i])) * 64n ** BigInt(str.length - 1 - i);
+        }
+        return result;
+      }
+      base13Encode(str) {
+        if (str == "-1") return "-1";
+        let input = BigInt(str);
+        let chars = "0123456789abc";
+        let result = "";
+        while (input > 0n) {
+          result = chars[input - (input / 13n) * 13n] + result;
+          input = BigInt(input / 13n);
+        }
+        return result;
+      }
+      base13Decode(str) {
+        if (str == "-1") return "-1";
+        let result = 0n;
+        let chars = "0123456789abc";
+        for (let i = str.length - 1; i >= 0; i--) {
+          result +=
+            BigInt(chars.indexOf(str[i])) * 13n ** BigInt(str.length - 1 - i);
+        }
+        return result;
+      }
+      base63Encode(str) {
+        if (str == "-1") return "-1";
+        let input = BigInt(str);
+        let chars =
+          "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ-";
+        let result = "";
+        while (input > 0n) {
+          result = chars[input - (input / 63n) * 63n] + result;
+          input = BigInt(input / 63n);
+        }
+        return result;
+      }
+      base63Decode(str) {
+        if (str == "-1") return "-1";
+        let result = 0n;
+        let chars =
+          "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ-";
+        for (let i = str.length - 1; i >= 0; i--) {
+          result +=
+            BigInt(chars.indexOf(str[i])) * 63n ** BigInt(str.length - 1 - i);
+        }
+        return result;
+      }
+    }
+
+    //=== YgolCollection: the ylcc code (YGO Lightning Card Collection) ===
+    //ylcc://<cards>.<names>
+    //  <cards>  base 64 (the yld alphabet) of a base 14 digit stream:
+    //             "1"        format version
+    //             5 digits   a card: its index in ygolID (as in yld)
+    //             "a" / "b"  the previous card repeats 1 / 2 more times (as in yld)
+    //             "d" + NN   the previous card repeats NN (2 digits) more times
+    //             "c"        end of a group
+    //  <names>  base 64 url (UTF-8) of the collection name followed by the group names, joined by "\n"
+    class YgolCollection {
+      static PREFIX = "ylcc://";
+      static VERSION = 1;
+      static B64 = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-_";
+      constructor(ygolID, hasCard = () => true) {
+        this.ygolID = ygolID;
+        this.hasCard = hasCard;
+        this.index = new Map();
+        ygolID.forEach((n, i) => {
+          if (!this.index.has(n)) this.index.set(n, i);
+        });
+        this.missing = []; //cards skipped by the last encode() / decode()
+      }
+      //collection: { name, groups: [{ name, cards: [cardName, ...] }] }  ->  "ylcc://..."
+      encode(collection) {
+        this.missing = [];
+        let d = String(YgolCollection.VERSION);
+        collection.groups.forEach((group, g) => {
+          if (g) d += "c";
+          const cards = group.cards;
+          for (let k = 0; k < cards.length; ) {
+            let run = 1;
+            while (k + run < cards.length && cards[k + run] === cards[k]) run++;
+            const idx = this.index.get(cards[k]);
+            if (idx === undefined) {
+              for (let i = 0; i < run; i++) this.missing.push(cards[k]);
+            } else {
+              d += String(idx).padStart(5, "0");
+              let extra = run - 1;
+              while (extra > 0) {
+                if (extra == 1) {
+                  d += "a";
+                  extra = 0;
+                } else if (extra == 2) {
+                  d += "b";
+                  extra = 0;
+                } else {
+                  const n = Math.min(extra, 99);
+                  d += "d" + String(n).padStart(2, "0");
+                  extra -= n;
+                }
+              }
+            }
+            k += run;
+          }
+        });
+        const names = [collection.name].concat(collection.groups.map((g) => g.name))
+          .map((n) => String(n).replace(/[\u0000-\u001f\u007f]/g, " "))
+          .join("\n");
+        return YgolCollection.PREFIX + this.b64Encode(this.b14ToBig(d)) + "." + this.nameEncode(names);
+      }
+      //"ylcc://..."  ->  { name, groups: [{ name, cards: [cardName, ...] }] }
+      decode(code) {
+        this.missing = [];
+        const bad = () => new Error("Invalid ylcc collection code");
+        code = code.trim();
+        if (!code.startsWith(YgolCollection.PREFIX)) throw bad();
+        const parts = code.slice(YgolCollection.PREFIX.length).split(".");
+        if (parts.length > 2 || !parts[0] || /[^A-Za-z0-9\-_]/.test(parts[0])) throw bad();
+        let names = [""];
+        if (parts[1]) {
+          try {
+            names = this.nameDecode(parts[1]).split("\n");
+          } catch (e) {
+            throw bad();
+          }
+        }
+        const raw = this.bigToB14(this.b64Decode(parts[0]));
+        if (raw[0] != "1") throw new Error("This collection code was made by a newer version of the page.");
+        const sections = raw.slice(1).split("c");
+        const empty = sections.length == 1 && sections[0] === "";
+        let groupNames = names.slice(1);
+        if (!groupNames.length && !empty) {
+          if (parts[1]) throw bad();
+          groupNames = sections.map((_, i) => `Group ${i + 1}`); //no names part at all
+        }
+        if (sections.length > Math.max(groupNames.length, 1)) throw bad();
+        const groups = [];
+        for (let g = 0; g < groupNames.length; g++) {
+          const s = sections[g] || "";
+          const cards = [];
+          let prev = null; //the last card read: { name, known }
+          for (let i = 0; i < s.length; ) {
+            const ch = s[i];
+            let copies;
+            if (ch >= "0" && ch <= "9") {
+              const id = s.slice(i, i + 5);
+              if (!/^\d{5}$/.test(id)) throw bad();
+              i += 5;
+              const name = this.ygolID[Number(id)];
+              prev = {
+                name: name !== undefined ? name : `Unknown card (ID ${Number(id)})`,
+                known: name !== undefined && this.hasCard(name),
+              };
+              copies = 1;
+            } else if (ch == "a" || ch == "b" || ch == "d") {
+              if (!prev) throw bad();
+              if (ch == "d") {
+                const n = s.slice(i + 1, i + 3);
+                if (!/^\d{2}$/.test(n)) throw bad();
+                copies = Number(n);
+                i += 3;
+              } else {
+                copies = ch == "a" ? 1 : 2;
+                i++;
+              }
+            } else {
+              throw bad();
+            }
+            for (let c = 0; c < copies; c++) (prev.known ? cards : this.missing).push(prev.name);
+          }
+          groups.push({ name: groupNames[g] || `Group ${g + 1}`, cards });
+        }
+        return { name: names[0], groups };
+      }
+      b14ToBig(str) {
+        let n = 0n;
+        for (let i = 0; i < str.length; i += 10) {
+          const chunk = str.slice(i, i + 10);
+          n = n * 14n ** BigInt(chunk.length) + BigInt(parseInt(chunk, 14));
+        }
+        return n;
+      }
+      bigToB14(n) {
+        return n.toString(14); //BigInt radix 14 is exactly 0-9a-d
+      }
+      b64Encode(n) {
+        let out = "";
+        while (n > 0n) {
+          out = YgolCollection.B64[Number(n & 63n)] + out;
+          n >>= 6n;
+        }
+        return out;
+      }
+      b64Decode(str) {
+        let n = 0n;
+        for (const ch of str) n = (n << 6n) | BigInt(YgolCollection.B64.indexOf(ch));
+        return n;
+      }
+      nameEncode(text) {
+        const bytes = new TextEncoder().encode(text);
+        let bin = "";
+        for (const b of bytes) bin += String.fromCharCode(b);
+        return btoa(bin).replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/, "");
+      }
+      nameDecode(str) {
+        const bin = atob(str.replace(/-/g, "+").replace(/_/g, "/"));
+        return new TextDecoder().decode(Uint8Array.from(bin, (c) => c.charCodeAt(0)));
+      }
+    }
+  </script>
+  <script>
+    //=== Collection page ===
+    const $ = (id) => document.getElementById(id);
+    const esc = (s) =>
+      String(s).replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c]);
+    const DEFAULT_GROUP = "Untitled Group";
+    const DEFAULT_COLLECTION = "Untitled Collection";
+    const MAX_GROUP_NAME = 40;
+    const MAX_COLLECTION_NAME = 60;
+    const STORAGE_KEY = "ygol.collection.v1";
+    const ERROR_IMG = "images/errorimage.jpg";
+    const SEARCH_LIMIT = 300;
+    const loadedSrc = new Map(); //card name -> image address that loaded for it
+
+    //--- state ---
+    const state = {
+      name: DEFAULT_COLLECTION,
+      groups: [], //{ id, name, cards: [cardName, ...] }
+      activeId: null,
+      stacked: true,
+      mode: "view", //view: a short click shows card info; edit: it adds/removes the card
+      nextId: 1,
+    };
+    let cardMap = new Map(); //name -> card object
+    let searchIndex = []; //lower-case "name\ndescription" per cardDb entry
+    let ygolDeck = null;
+    let codec = null;
+    let dataReady = false;
+    let filters = [];
+    let sort = "Popularity";
+
+    function cleanName(s, max) {
+      return String(s).replace(/[\u0000-\u001f\u007f]/g, " ").slice(0, max);
+    }
+    function nameUrl(str) {
+      return str.replace(/[^a-zA-Z0-9\s_\-\.\(\)%]/g, "").replace(/\s/g, "_").substring(0, 255);
+    }
+    function isExtra(name) {
+      const c = cardMap.get(name);
+      return !!c && c.priorityDl >= 2000000000;
+    }
+    function activeGroup() {
+      return state.groups.find((g) => g.id === state.activeId) || null;
+    }
+    function groupById(id) {
+      return state.groups.find((g) => g.id === Number(id)) || null;
+    }
+    function uniqueGroupName(base, groups = state.groups) {
+      const used = new Set(groups.map((g) => g.name));
+      if (!used.has(base)) return base;
+      for (let n = 2; ; n++) {
+        const candidate = cleanName(`${base} (${n})`, 80);
+        if (!used.has(candidate)) return candidate;
+      }
+    }
+    function makeGroup(name, cards = []) {
+      return { id: state.nextId++, name, cards };
+    }
+    function countOf(group, name) {
+      let n = 0;
+      for (const c of group.cards) if (c === name) n++;
+      return n;
+    }
+    function totalCards() {
+      return state.groups.reduce((s, g) => s + g.cards.length, 0);
+    }
+
+    //--- the open group as shown: stacked = one entry per different card, expanded = one per copy ---
+    function entriesOf(g) {
+      if (!state.stacked) return g.cards.map((name, idx) => ({ name, qty: 1, idx }));
+      const m = new Map();
+      for (const n of g.cards) m.set(n, (m.get(n) || 0) + 1);
+      let idx = 0;
+      return [...m].map(([name, qty]) => ({ name, qty, idx: idx++ }));
+    }
+    //flat position where display entry di starts
+    function flatPosOf(g, di) {
+      if (!state.stacked) return Math.min(di, g.cards.length);
+      const es = entriesOf(g);
+      return di >= es.length ? g.cards.length : g.cards.indexOf(es[di].name);
+    }
+    //add a copy; di = display position to put it at, or undefined to put it with its other copies (stacked) / at the end
+    function addCopy(g, name, di) {
+      const last = g.cards.lastIndexOf(name);
+      if (state.stacked && last != -1) return void g.cards.splice(last + 1, 0, name);
+      if (di === undefined) return void g.cards.push(name);
+      g.cards.splice(flatPosOf(g, di), 0, name);
+    }
+    //add a copy to a group that isn't open: next to its other copies, else at the end
+    function addToOther(g, name) {
+      const last = g.cards.lastIndexOf(name);
+      g.cards.splice(last == -1 ? g.cards.length : last + 1, 0, name);
+    }
+    //add another copy right after copy idx (expanded) or at the end of its stack (stacked)
+    function addCopyAfter(g, name, idx) {
+      const at = state.stacked ? g.cards.lastIndexOf(name) : idx;
+      g.cards.splice(at + 1, 0, name);
+    }
+    function removeCopy(g, name, idx) {
+      if (state.stacked) {
+        const i = g.cards.lastIndexOf(name);
+        if (i >= 0) g.cards.splice(i, 1);
+      } else if (g.cards[idx] === name) {
+        g.cards.splice(idx, 1);
+      } else {
+        const i = g.cards.lastIndexOf(name);
+        if (i >= 0) g.cards.splice(i, 1);
+      }
+    }
+    //move display entry `from` so that it ends up at position `to` of the list without it
+    function moveEntry(g, from, to) {
+      if (state.stacked) {
+        const es = entriesOf(g).map((e) => [e.name, e.qty]);
+        const [item] = es.splice(from, 1);
+        es.splice(to, 0, item);
+        g.cards = es.flatMap(([n, q]) => Array(q).fill(n));
+      } else {
+        const [n] = g.cards.splice(from, 1);
+        g.cards.splice(to, 0, n);
+      }
+    }
+    function sortCards(g) {
+      const key = (n) => {
+        const c = cardMap.get(n) || {};
+        return [c.priorityDl >= 2000000000 ? 1 : 0, -(c.priorityDl || 0)];
+      };
+      g.cards.sort((a, b) => {
+        const ka = key(a), kb = key(b);
+        return ka[0] - kb[0] || ka[1] - kb[1] || a.localeCompare(b);
+      });
+    }
+
+    //--- rendering ---
+    function imgTag(name, extra = "") {
+      const src = loadedSrc.get(name) || `images/cards/${nameUrl(name)}.jpg`;
+      return `<img class="cimg" src="${esc(src)}" data-name="${esc(name)}" alt="${esc(name)}" draggable="false" loading="lazy"${extra}>`;
+    }
+    //every card image: try the local file, then the card's online art, then the error image
+    document.addEventListener(
+      "error",
+      (e) => {
+        const img = e.target;
+        if (!(img instanceof HTMLImageElement) || !img.classList.contains("cimg")) return;
+        const c = cardMap.get(img.dataset.name);
+        const stage = Number(img.dataset.stage || 0);
+        if (stage == 0 && c && c.altimg) {
+          img.dataset.stage = 1;
+          img.src = c.altimg;
+        } else if (stage < 2) {
+          img.dataset.stage = 2;
+          img.src = ERROR_IMG;
+        }
+      },
+      true
+    );
+    document.addEventListener(
+      "load",
+      (e) => {
+        const img = e.target;
+        if (img instanceof HTMLImageElement && img.classList.contains("cimg")) loadedSrc.set(img.dataset.name, img.src);
+      },
+      true
+    );
+
+    function renderGroupList() {
+      const f = $("groupFilter").value.trim().toLowerCase();
+      const list = state.groups.filter((g) => !f || g.name.toLowerCase().includes(f));
+      $("groupList").innerHTML = list.length
+        ? list
+            .map(
+              (g) =>
+                `<div class="group-row${g.id === state.activeId ? " active" : ""}${g.cards.length ? "" : " empty"}" data-id="${g.id}">` +
+                `<span class="grip" title="Drag to reorder">⋮⋮</span><span class="gname">${esc(g.name)}</span><span class="gcount">${g.cards.length}</span></div>`
+            )
+            .join("")
+        : `<div class="emptynote">${
+            state.groups.length ? "No group matches the filter." : "No groups yet.<br>Press “+ New Group” to start."
+          }</div>`;
+      $("groupCountChip").textContent = state.groups.length;
+      const has = !!activeGroup();
+      for (const id of ["btnRename", "btnDuplicate", "btnDelete", "btnSort", "btnClear"]) $(id).disabled = !has;
+      $("btnMode").classList.toggle("selected", state.mode == "edit");
+    }
+    function renderGroupCards() {
+      const box = $("groupCards");
+      const g = activeGroup();
+      const scroll = box.scrollTop;
+      if (!dataReady) {
+        box.innerHTML = `<div class="emptynote">Loading card data...</div>`;
+      } else if (!g) {
+        box.innerHTML = `<div class="emptynote">No group is open.<br>Create one with “+ New Group”, or add a card from the search.</div>`;
+      } else if (!g.cards.length) {
+        box.innerHTML = `<div class="emptynote">This group is empty.<br>Search for a card, then switch to Edit mode and click it (or drag it here).</div>`;
+      } else {
+        box.innerHTML = entriesOf(g)
+          .map(
+            (e) =>
+              `<div class="cell" data-loc="group" data-name="${esc(e.name)}" data-idx="${e.idx}">${imgTag(e.name)}` +
+              `${e.qty > 1 ? `<span class="qty">×${e.qty}</span>` : ""}</div>`
+          )
+          .join("");
+      }
+      box.scrollTop = scroll;
+      const nameInput = $("groupName");
+      if (document.activeElement !== nameInput) nameInput.value = g ? g.name : "";
+      nameInput.disabled = !g;
+      $("btnStack").textContent = state.stacked ? "View: Stacked" : "View: Expanded";
+    }
+    //the ✓ N badges on the search results: copies already in the open group
+    function refreshOwned() {
+      const g = activeGroup();
+      const counts = new Map();
+      if (g) for (const n of g.cards) counts.set(n, (counts.get(n) || 0) + 1);
+      for (const cell of $("searchResult").querySelectorAll(".cell")) {
+        const n = counts.get(cell.dataset.name) || 0;
+        let b = cell.querySelector(".owned");
+        if (n && !b) {
+          b = document.createElement("span");
+          b.className = "owned";
+          cell.appendChild(b);
+        }
+        if (b) {
+          if (n) b.textContent = `✓ ${n}`;
+          else b.remove();
+        }
+      }
+    }
+    function renderAll() {
+      renderGroupList();
+      renderGroupCards();
+      refreshOwned();
+    }
+    function changed() {
+      renderAll();
+      saveSoon();
+    }
+
+    //--- groups ---
+    function selectGroup(id, goToCards = false) {
+      state.activeId = id;
+      renderAll();
+      saveSoon();
+      if (goToCards && isPhone()) showScreen("cards");
+    }
+    function newGroup(userAsked = true) {
+      const g = makeGroup(uniqueGroupName(DEFAULT_GROUP));
+      state.groups.push(g);
+      state.activeId = g.id;
+      $("groupFilter").value = "";
+      changed();
+      if (userAsked) {
+        if (isPhone()) showScreen("cards");
+        focusGroupName();
+      }
+      return g;
+    }
+    function focusGroupName() {
+      const input = $("groupName");
+      input.focus();
+      input.select();
+    }
+    function duplicateGroup() {
+      const g = activeGroup();
+      if (!g) return;
+      const copy = makeGroup(uniqueGroupName(cleanName(`${g.name} (copy)`, 80)), g.cards.slice());
+      state.groups.splice(state.groups.indexOf(g) + 1, 0, copy);
+      state.activeId = copy.id;
+      changed();
+    }
+    function askDeleteGroup(g = activeGroup()) {
+      if (!g) return;
+      openPopup({
+        title: `Delete “${g.name}”?`,
+        hint: `This group has <b>${g.cards.length}</b> ${g.cards.length == 1 ? "card" : "cards"} (${new Set(g.cards).size} different). It can’t be brought back.`,
+        choices: [
+          { label: "Cancel", selected: true },
+          {
+            label: "Delete group",
+            danger: true,
+            onSelect: () => {
+              const i = state.groups.indexOf(g);
+              state.groups.splice(i, 1);
+              if (state.activeId === g.id) {
+                const next = state.groups[Math.min(i, state.groups.length - 1)];
+                state.activeId = next ? next.id : null;
+              }
+              changed();
+            },
+          },
+        ],
+      });
+    }
+    function askClearGroup() {
+      const g = activeGroup();
+      if (!g || !g.cards.length) return;
+      openPopup({
+        title: `Remove all cards from “${g.name}”?`,
+        hint: `<b>${g.cards.length}</b> cards will be removed. The group itself stays.`,
+        choices: [
+          { label: "Cancel", selected: true },
+          {
+            label: "Remove all cards",
+            danger: true,
+            onSelect: () => {
+              g.cards = [];
+              changed();
+            },
+          },
+        ],
+      });
+    }
+    function moveGroup(id, beforeId) {
+      const from = state.groups.findIndex((g) => g.id === id);
+      if (from < 0) return;
+      const [g] = state.groups.splice(from, 1);
+      const to = beforeId == null ? state.groups.length : state.groups.findIndex((x) => x.id === beforeId);
+      state.groups.splice(to < 0 ? state.groups.length : to, 0, g);
+      changed();
+    }
+
+    //--- cards ---
+    function ensureGroup() {
+      return activeGroup() || newGroup(false);
+    }
+    function addCard(name, groupId = null, di) {
+      if (!cardMap.has(name)) return;
+      const g = groupId != null ? groupById(groupId) : ensureGroup();
+      if (!g) return;
+      if (g === activeGroup()) addCopy(g, name, di);
+      else addToOther(g, name);
+      changed();
+    }
+    //--- search ---
+    const COLLECTION_FILTERS = ["In This Group", "In Any Group", "In No Group"];
+    const isExtraCard = (a) => ["Fusion", "Synchro", "Xyz", "Link"].some((t) => a.monsterType.includes(t));
+    function testFilter(t, a) {
+      if (t == "Monster" || t == "Spell" || t == "Trap") return a.type == t;
+      if (t.endsWith(" Monster")) {
+        if (a.type != "Monster") return false;
+        const k = t.slice(0, -8);
+        if (k == "Main Deck") return !isExtraCard(a);
+        if (k == "Extra Deck") return isExtraCard(a);
+        if (k == "Non-Effect") return !a.monsterType.includes("Effect");
+        return a.monsterType.includes(k);
+      }
+      if (t.endsWith(" Spell")) return a.type == "Spell" && (a.race || "").includes(t.slice(0, -6));
+      if (t.endsWith(" Trap")) return a.type == "Trap" && (a.race || "").includes(t.slice(0, -5));
+      if (t.startsWith("Level/Rank ")) return a.level == t.slice(11);
+      if (t.startsWith("Link ")) return a.linkRating == t.slice(5);
+      if (t == "Handtrap") return !!a.handtrap;
+      if (t == "Floodgate") return !!a.floodgate;
+      if (/^[A-Z]+$/.test(t)) return a.attribute == t;
+      return a.race == t;
+    }
+    let searchTimer = null;
+    function searchSoon() {
+      clearTimeout(searchTimer);
+      searchTimer = setTimeout(runSearch, 300);
+    }
+    function runSearch() {
+      clearTimeout(searchTimer);
+      const box = $("searchResult");
+      if (!dataReady) return;
+      const q = $("searchInput").value.trim().toLowerCase();
+      if (!(q.length > 2 || filters.length)) {
+        box.innerHTML = `<div class="emptynote">Type at least 3 letters, or pick a filter in Options.</div>`;
+        return;
+      }
+      const cardFilters = filters.filter((f) => !COLLECTION_FILTERS.includes(f));
+      const wantThis = filters.includes("In This Group");
+      const wantAny = filters.includes("In Any Group");
+      const wantNone = filters.includes("In No Group");
+      const g = activeGroup();
+      const inThis = new Set(g ? g.cards : []);
+      const inAny = new Set();
+      if (wantAny || wantNone) for (const x of state.groups) for (const n of x.cards) inAny.add(n);
+      let found = [];
+      for (let i = 0; i < cardDb.length; i++) {
+        const a = cardDb[i];
+        if (a.rush) continue;
+        if (q && !searchIndex[i].includes(q)) continue;
+        if (wantThis && !inThis.has(a.name)) continue;
+        if (wantAny && !inAny.has(a.name)) continue;
+        if (wantNone && inAny.has(a.name)) continue;
+        let ok = true;
+        for (const t of cardFilters) if (!testFilter(t, a)) { ok = false; break; }
+        if (ok) found.push(a);
+      }
+      if (sort == "Popularity") found.sort((a, b) => (a.popularityTcg ?? 1e9) - (b.popularityTcg ?? 1e9));
+      else found.sort((a, b) => a.name.localeCompare(b.name));
+      const more = found.length - SEARCH_LIMIT;
+      if (more > 0) found.length = SEARCH_LIMIT;
+      box.innerHTML = found.length
+        ? found.map((a) => `<div class="cell" data-loc="search" data-name="${esc(a.name)}">${imgTag(a.name)}</div>`).join("") +
+          (more > 0 ? `<div class="emptynote">${more} more not shown. Narrow the search.</div>` : "")
+        : `<div class="emptynote">No cards found.</div>`;
+      box.scrollTop = 0;
+      refreshOwned();
+    }
+
+    //--- filter options popup ---
+    const FILTER_SECTIONS = [
+      ["Card Type", ["Monster", "Spell", "Trap"]],
+      ["Monster Type", ["Normal Monster", "Effect Monster", "Fusion Monster", "Ritual Monster", "Synchro Monster", "Xyz Monster", "Pendulum Monster", "Link Monster", "Main Deck Monster", "Extra Deck Monster", "|", "Tuner Monster", "Union Monster", "Spirit Monster", "Flip Monster", "Gemini Monster", "Toon Monster", "Non-Effect Monster"]],
+      ["Spell Type", ["Normal Spell", "Continuous Spell", "Equip Spell", "Field Spell", "Ritual Spell", "Quick-Play Spell"]],
+      ["Trap Type", ["Normal Trap", "Continuous Trap", "Counter Trap"]],
+      ["Level/Rank", Array.from({ length: 13 }, (_, i) => `Level/Rank ${i + 1}`)],
+      ["Link Rating", Array.from({ length: 6 }, (_, i) => `Link ${i + 1}`)],
+      ["Attribute", ["LIGHT", "DARK", "EARTH", "WIND", "WATER", "FIRE", "DIVINE"]],
+      ["Type", ["Aqua", "Beast", "Beast-Warrior", "Creator-God", "Cyberse", "Dinosaur", "Divine-Beast", "Dragon", "Fairy", "Fiend", "Fish", "Insect", "Machine", "Plant", "Psychic", "Pyro", "Reptile", "Rock", "Sea Serpent", "Spellcaster", "Thunder", "Warrior", "Winged Beast", "Wyrm", "Zombie"]],
+      ["Staples", ["Handtrap", "Floodgate"]],
+      ["Collection", COLLECTION_FILTERS],
+    ];
+    let popupKind = "";
+    function openFilter() {
+      const pop = $("popup");
+      let html = `<p class="filterheader" style="margin-top:0">Sort By</p><div class="filterbtns">` +
+        ["Popularity", "Name"].map((s) => `<button data-sort="${s}">${s}</button>`).join("") + `</div>`;
+      for (const [title, items] of FILTER_SECTIONS) {
+        html += `<p class="filterheader">${esc(title)}</p><div class="filterbtns">` +
+          items.map((t) => (t == "|" ? "<br><br>" : `<button data-filter="${esc(t)}">${esc(t)}</button>`)).join("") + `</div>`;
+      }
+      html += `<div class="filterfoot"><button data-act="clear">Clear Filters</button><button data-act="done">Done</button></div>`;
+      pop.innerHTML = html;
+      pop.scrollTop = 0;
+      popupKind = "filter";
+      $("popupCss1").style.display = "flex";
+      updateFilterButtons();
+    }
+    function updateFilterButtons() {
+      for (const b of $("popup").querySelectorAll("button[data-filter]")) b.classList.toggle("selected", filters.includes(b.dataset.filter));
+      for (const b of $("popup").querySelectorAll("button[data-sort]")) b.classList.toggle("selected", b.dataset.sort == sort);
+    }
+    $("popup").addEventListener("click", (e) => {
+      if (popupKind != "filter") return;
+      e.stopPropagation();
+      const b = e.target.closest("button");
+      if (!b) return;
+      if (b.dataset.filter) {
+        const t = b.dataset.filter;
+        filters = filters.includes(t) ? filters.filter((x) => x != t) : filters.concat(t);
+      } else if (b.dataset.sort) {
+        sort = b.dataset.sort;
+      } else if (b.dataset.act == "clear") {
+        filters = [];
+      } else if (b.dataset.act == "done") {
+        closeInfoPopup();
+        runSearch();
+        return;
+      }
+      updateFilterButtons();
+    });
+
+    //--- card info popup (short click, click and hold, right click) ---
+    function showInfo(name) {
+      const c = cardMap.get(name);
+      if (!c) return;
+      const pop = $("popup");
+      const rows = state.groups.map((g) => [g, countOf(g, name)]).filter((r) => r[1] > 0);
+      const copies = rows.reduce((s, r) => s + r[1], 0);
+      pop.innerHTML =
+        `<div class="infoimg">${imgTag(name)}</div><p class="cardname">${esc(c.name)}</p><p class="carddesc">${esc(c.description)}</p>` +
+        `<h3>In your groups${rows.length ? ` <span class="muted">· ${copies} ${copies == 1 ? "copy" : "copies"} in ${rows.length} ${rows.length == 1 ? "group" : "groups"}</span>` : ""}</h3>` +
+        (rows.length
+          ? `<table class="foundlist">${rows
+              .map((r) => `<tr class="${r[0].id === state.activeId ? "here" : ""}" data-id="${r[0].id}"><td>${esc(r[0].name)}${r[0].id === state.activeId ? " (open)" : ""}</td><td class="n">×${r[1]}</td></tr>`)
+              .join("")}</table>`
+          : `<p class="muted" style="margin-top:0">Not in any group yet.</p>`);
+      pop.scrollTop = 0;
+      popupKind = "info";
+      $("popupCss1").style.display = "flex";
+    }
+    function closeInfoPopup() {
+      $("popupCss1").style.display = "none";
+      popupKind = "";
+    }
+    $("popupCss1").addEventListener("click", (e) => {
+      if (popupKind == "info") {
+        const row = e.target.closest("tr[data-id]");
+        closeInfoPopup();
+        if (row) selectGroup(Number(row.dataset.id), true);
+      } else if (popupKind == "filter" && !e.target.closest("#popup")) {
+        closeInfoPopup();
+        runSearch();
+      }
+    });
+
+    //--- mode / view buttons ---
+    function setMode(m) {
+      state.mode = m;
+      document.body.classList.toggle("edit", m == "edit");
+      $("btnMode").textContent = m == "edit" ? "Mode: Edit" : "Mode: View";
+      $("btnMode").classList.toggle("selected", m == "edit");
+    }
+    $("btnMode").addEventListener("click", () => setMode(state.mode == "view" ? "edit" : "view"));
+    $("btnStack").addEventListener("click", () => {
+      state.stacked = !state.stacked;
+      renderGroupCards();
+      saveSoon();
+    });
+    $("btnSort").addEventListener("click", () => {
+      const g = activeGroup();
+      if (g) {
+        sortCards(g);
+        changed();
+      }
+    });
+    $("btnClear").addEventListener("click", askClearGroup);
+    $("btnNewGroup").addEventListener("click", () => newGroup(true));
+    $("btnDuplicate").addEventListener("click", duplicateGroup);
+    $("btnDelete").addEventListener("click", () => askDeleteGroup());
+    $("btnRename").addEventListener("click", () => {
+      if (!activeGroup()) return;
+      if (isPhone()) showScreen("cards");
+      focusGroupName();
+    });
+    $("btnOptions").addEventListener("click", openFilter);
+    $("groupFilter").addEventListener("input", renderGroupList);
+    $("searchInput").addEventListener("input", searchSoon);
+    $("searchInput").addEventListener("keydown", (e) => {
+      if (e.key == "Enter") runSearch();
+    });
+    $("collectionName").addEventListener("input", (e) => {
+      state.name = cleanName(e.target.value, MAX_COLLECTION_NAME);
+      saveSoon();
+    });
+    $("collectionName").addEventListener("blur", (e) => {
+      state.name = cleanName(e.target.value, MAX_COLLECTION_NAME).trim() || DEFAULT_COLLECTION;
+      e.target.value = state.name;
+      saveSoon();
+    });
+    $("groupName").addEventListener("input", (e) => {
+      const g = activeGroup();
+      if (!g) return;
+      g.name = cleanName(e.target.value, MAX_GROUP_NAME);
+      const row = $("groupList").querySelector(`.group-row[data-id="${g.id}"] .gname`);
+      if (row) row.textContent = g.name;
+      saveSoon();
+    });
+    $("groupName").addEventListener("blur", (e) => {
+      const g = activeGroup();
+      if (!g) return;
+      g.name = cleanName(e.target.value, MAX_GROUP_NAME).trim() || DEFAULT_GROUP;
+      e.target.value = g.name;
+      renderGroupList();
+      saveSoon();
+    });
+    $("groupName").addEventListener("keydown", (e) => {
+      if (e.key == "Enter") e.target.blur();
+    });
+
+    //--- phones: three screens ---
+    const isPhone = () => window.matchMedia("(max-aspect-ratio: 1/1)").matches;
+    function showScreen(name) {
+      document.body.classList.remove("scr-groups", "scr-cards", "scr-search");
+      document.body.classList.add("scr-" + name);
+      for (const b of $("tabs").querySelectorAll("button")) b.classList.toggle("selected", b.dataset.screen == name);
+      window.scrollTo(0, 0);
+    }
+    $("tabs").addEventListener("click", (e) => {
+      const b = e.target.closest("button");
+      if (b) showScreen(b.dataset.screen);
+    });
+    showScreen("groups");
+
+    //=== mouse: click, click and hold, drag and drop ===
+    const HOLD_MS = 500;
+    const DRAG_PX = 6;
+    const isMac = /Mac/.test(navigator.platform);
+    let lastPointerType = "mouse";
+    let press = null; //a card pressed with the mouse
+    let gdrag = null; //a group row being dragged by its handle
+    document.addEventListener("pointerdown", (e) => (lastPointerType = e.pointerType), true);
+
+    //right click (or Ctrl+click on a Mac) opens the context menu
+    function isSecondary(e) {
+      return e.button != 0 || (isMac && e.ctrlKey);
+    }
+    document.addEventListener("pointerdown", (e) => {
+      if (e.pointerType != "mouse" || isSecondary(e)) return;
+      const cell = e.target.closest(".cell[data-name]");
+      if (!cell) return;
+      press = { cell, name: cell.dataset.name, loc: cell.dataset.loc, idx: Number(cell.dataset.idx || 0), x: e.clientX, y: e.clientY, moved: false, hold: false };
+      press.timer = setTimeout(() => {
+        if (press && !press.moved) {
+          press.hold = true;
+          showInfo(press.name);
+        }
+      }, HOLD_MS);
+    });
+    document.addEventListener("pointermove", (e) => {
+      if (gdrag) return groupDragMove(e);
+      if (!press || press.hold) return;
+      if (!press.moved) {
+        if (Math.hypot(e.clientX - press.x, e.clientY - press.y) < DRAG_PX) return;
+        press.moved = true;
+        clearTimeout(press.timer);
+        startGhost();
+      }
+      moveGhost(e);
+    });
+    document.addEventListener("pointercancel", () => {
+      if (gdrag) groupDragEnd();
+      if (press) {
+        clearTimeout(press.timer);
+        endGhost();
+        press = null;
+      }
+    });
+    document.addEventListener("pointerup", (e) => {
+      if (gdrag) return groupDragEnd(e);
+      if (!press) return;
+      const p = press;
+      press = null;
+      clearTimeout(p.timer);
+      if (p.hold) return closeInfoPopup();
+      if (p.moved) {
+        const drop = dropTarget(e);
+        endGhost();
+        return handleDrop(p, drop, e);
+      }
+      shortClick(p.name, p.loc, p.idx, p.cell);
+    });
+    //touch screens: a tap
+    document.addEventListener("click", (e) => {
+      if (lastPointerType == "mouse") return;
+      const cell = e.target.closest(".cell[data-name]");
+      if (cell) shortClick(cell.dataset.name, cell.dataset.loc, Number(cell.dataset.idx || 0), cell);
+    });
+    function shortClick(name, loc, idx, cell) {
+      if (state.mode == "view") return showInfo(name);
+      if (loc == "search") {
+        addCard(name);
+      } else {
+        const g = activeGroup();
+        if (g) {
+          removeCopy(g, name, idx);
+          changed();
+        }
+      }
+    }
+    document.addEventListener("contextmenu", (e) => {
+      const cell = e.target.closest(".cell[data-name]");
+      const row = e.target.closest(".group-row");
+      if (cell) {
+        e.preventDefault();
+        if (e.pointerType == "touch" || lastPointerType == "touch") return showInfo(cell.dataset.name);
+        clearTimeout(press && press.timer);
+        press = null;
+        const g = activeGroup();
+        //edit mode: right click on a card of the group adds another copy of it
+        if (state.mode == "edit" && cell.dataset.loc == "group" && g) {
+          addCopyAfter(g, cell.dataset.name, Number(cell.dataset.idx));
+          changed();
+        } else {
+          showInfo(cell.dataset.name);
+        }
+      } else if (row) {
+        e.preventDefault();
+        openMenu(e.clientX, e.clientY, Number(row.dataset.id));
+      }
+    });
+
+    //--- the card that follows the cursor ---
+    function startGhost() {
+      const ghost = $("ghost");
+      const img = press.cell.querySelector("img");
+      ghost.style.width = press.cell.getBoundingClientRect().width + "px";
+      ghost.innerHTML = "";
+      ghost.appendChild(img.cloneNode());
+      ghost.style.display = "block";
+      press.cell.classList.add("lifted");
+      document.body.classList.add("dragging");
+    }
+    function moveGhost(e) {
+      const ghost = $("ghost");
+      ghost.style.left = e.clientX - ghost.offsetWidth / 2 + "px";
+      ghost.style.top = e.clientY - ghost.offsetHeight / 2 + "px";
+      const t = dropTarget(e);
+      for (const r of document.querySelectorAll(".group-row.drop")) r.classList.remove("drop");
+      $("groupCards").classList.toggle("dropbox", t.kind == "cards");
+      const tip = $("dropTip");
+      if (t.kind == "row" && !(press.loc == "group" && t.group === activeGroup())) {
+        t.row.classList.add("drop");
+        const all = e.shiftKey && state.stacked && press.loc == "group";
+        const q = esc(t.group.name);
+        tip.innerHTML =
+          press.loc == "search"
+            ? `Add to <b>${q}</b>`
+            : `Move ${all ? "all copies" : "one copy"} to <b>${q}</b>${state.stacked && !all ? ` <span>· Shift: all copies</span>` : ""}`;
+        tip.style.display = "block";
+        tip.style.left = Math.min(e.clientX + 16, window.innerWidth - tip.offsetWidth - 4) + "px";
+        tip.style.top = e.clientY + 22 + "px";
+      } else {
+        tip.style.display = "none";
+      }
+    }
+    function endGhost() {
+      $("ghost").style.display = "none";
+      $("dropTip").style.display = "none";
+      document.body.classList.remove("dragging");
+      $("groupCards").classList.remove("dropbox");
+      for (const r of document.querySelectorAll(".group-row.drop")) r.classList.remove("drop");
+      for (const c of document.querySelectorAll(".cell.lifted")) c.classList.remove("lifted");
+    }
+    //what is under the cursor: a group row, the group's card box, the search results, or nothing
+    function dropTarget(e) {
+      const el = document.elementFromPoint(e.clientX, e.clientY);
+      if (!el) return { kind: "none" };
+      const row = el.closest(".group-row");
+      if (row) return { kind: "row", row, group: groupById(row.dataset.id) };
+      if (el.closest("#groupCards")) return { kind: "cards" };
+      if (el.closest("#searchResult")) return { kind: "search" };
+      return { kind: "none" };
+    }
+    //display position in the group's card box for a drop at (x, y): cards in rows above, plus cards in the row left of it
+    function dropIndexAt(e, skipCell) {
+      let index = 0;
+      for (const cell of $("groupCards").querySelectorAll(".cell")) {
+        if (cell === skipCell) continue;
+        const r = cell.getBoundingClientRect();
+        if (r.bottom <= e.clientY || (r.top <= e.clientY && r.left + r.width / 2 < e.clientX)) index++;
+      }
+      return index;
+    }
+    function handleDrop(p, drop, e) {
+      const g = activeGroup();
+      if (drop.kind == "row" && drop.group) {
+        if (p.loc == "search") return addCard(p.name, drop.group.id);
+        if (!g || drop.group === g) return;
+        const n = e.shiftKey && state.stacked ? countOf(g, p.name) : 1;
+        for (let i = 0; i < n; i++) {
+          addToOther(drop.group, p.name);
+          removeCopy(g, p.name, p.idx);
+        }
+        return changed();
+      }
+      if (drop.kind == "cards") {
+        const to = dropIndexAt(e, p.loc == "group" ? p.cell : null);
+        if (p.loc == "search") return addCard(p.name, null, to);
+        if (g) {
+          moveEntry(g, p.idx, to);
+          changed();
+        }
+        return;
+      }
+      if (drop.kind == "search" && p.loc == "group" && g) {
+        removeCopy(g, p.name, p.idx);
+        changed();
+      }
+    }
+
+    //--- reordering the groups with the handle ---
+    $("groupList").addEventListener("pointerdown", (e) => {
+      const grip = e.target.closest(".grip");
+      if (!grip || isSecondary(e) || $("groupFilter").value) return;
+      const row = grip.closest(".group-row");
+      gdrag = { id: Number(row.dataset.id), row, before: undefined };
+      row.classList.add("moving");
+      document.body.classList.add("dragging");
+      e.preventDefault();
+    });
+    function groupDragMove(e) {
+      const rows = [...$("groupList").querySelectorAll(".group-row")];
+      for (const r of rows) r.classList.remove("before", "after");
+      let target = null;
+      for (const r of rows) {
+        const b = r.getBoundingClientRect();
+        if (e.clientY < b.top + b.height / 2) {
+          target = r;
+          break;
+        }
+      }
+      if (target) target.classList.add("before");
+      else if (rows.length) rows[rows.length - 1].classList.add("after");
+      gdrag.before = target ? Number(target.dataset.id) : null;
+    }
+    function groupDragEnd() {
+      const d = gdrag;
+      gdrag = null;
+      document.body.classList.remove("dragging");
+      d.row.classList.remove("moving");
+      for (const r of $("groupList").querySelectorAll(".group-row")) r.classList.remove("before", "after");
+      if (d.before !== undefined && d.before !== d.id) moveGroup(d.id, d.before);
+    }
+    //a click on a group row opens it; a double click renames it
+    $("groupList").addEventListener("click", (e) => {
+      if (e.target.closest(".grip")) return;
+      const row = e.target.closest(".group-row");
+      if (row) selectGroup(Number(row.dataset.id), true);
+    });
+    $("groupList").addEventListener("dblclick", (e) => {
+      if (e.target.closest(".grip")) return;
+      const row = e.target.closest(".group-row");
+      if (row) {
+        selectGroup(Number(row.dataset.id), true);
+        focusGroupName();
+      }
+    });
+
+    //--- right-click menu on a group ---
+    function openMenu(x, y, id) {
+      const g = groupById(id);
+      if (!g) return;
+      const m = $("menu");
+      m.innerHTML = `<button data-a="rename">Rename</button><button data-a="dup">Duplicate</button><button data-a="del" class="del">Delete</button>`;
+      m.style.display = "block";
+      m.style.left = Math.min(x, window.innerWidth - m.offsetWidth - 4) + "px";
+      m.style.top = Math.min(y, window.innerHeight - m.offsetHeight - 4) + "px";
+      m.onclick = (ev) => {
+        const b = ev.target.closest("button");
+        if (!b) return;
+        closeMenu();
+        state.activeId = g.id;
+        renderAll();
+        if (b.dataset.a == "rename") focusGroupName();
+        else if (b.dataset.a == "dup") duplicateGroup();
+        else askDeleteGroup(g);
+      };
+    }
+    function closeMenu() {
+      $("menu").style.display = "none";
+    }
+    document.addEventListener("pointerdown", (e) => {
+      if (!e.target.closest("#menu")) closeMenu();
+    }, true);
+
+    //=== popups: copy / download / upload / confirmations ===
+    const layer = $("exportLayer");
+    //o: { title, hint (html), seg: [{label, selected, disabled, onSelect}], list: [[left, right]], choices: [{label, desc, notes, selected, danger, keep, onSelect}] }
+    function openPopup(o) {
+      $("exportTitle").textContent = o.title;
+      const root = $("exportOptions");
+      root.innerHTML = "";
+      if (o.hint) {
+        const p = document.createElement("p");
+        p.className = "export-hint";
+        p.innerHTML = o.hint;
+        root.appendChild(p);
+      }
+      if (o.seg) {
+        const seg = document.createElement("div");
+        seg.className = "seg";
+        for (const s of o.seg) {
+          const b = document.createElement("button");
+          b.type = "button";
+          b.textContent = s.label;
+          b.className = s.selected ? "selected" : "";
+          b.disabled = !!s.disabled;
+          b.addEventListener("click", s.onSelect);
+          seg.appendChild(b);
+        }
+        root.appendChild(seg);
+      }
+      if (o.list) {
+        const l = document.createElement("div");
+        l.className = "importlist";
+        l.innerHTML = o.list.map((r) => `<div><span>${esc(r[0])}</span><span class="muted">${esc(r[1])}</span></div>`).join("");
+        root.appendChild(l);
+      }
+      for (const c of o.choices || []) {
+        const b = document.createElement("button");
+        b.type = "button";
+        b.className = "export-option" + (c.selected ? " selected" : "") + (c.danger ? " danger" : "");
+        b.innerHTML = `${esc(c.label)}${c.desc ? `<span class="export-desc">${esc(c.desc)}</span>` : ""}${(c.notes || []).map((n) => `<span class="export-note">${esc(n)}</span>`).join("")}`;
+        b.addEventListener("click", () => {
+          if (!c.keep) closePopup();
+          if (c.onSelect) c.onSelect();
+        });
+        root.appendChild(b);
+      }
+      layer.classList.add("open");
+      (root.querySelector(".export-option.selected") || $("exportBox")).focus();
+    }
+    function closePopup() {
+      layer.classList.remove("open");
+    }
+    layer.addEventListener("click", (e) => {
+      if (e.target === layer) closePopup();
+    });
+    document.addEventListener("keydown", (e) => {
+      if (e.key != "Escape") return;
+      closePopup();
+      closeMenu();
+      if (popupKind == "info") closeInfoPopup();
+      else if (popupKind == "filter") {
+        closeInfoPopup();
+        runSearch();
+      }
+    });
+
+    //--- export ---
+    const sanitizeFile = (s, fallback) => String(s).replace(/[\\/:*?"<>|]/g, "").trim() || fallback;
+    function collectionData() {
+      return { name: state.name || DEFAULT_COLLECTION, groups: state.groups.map((g) => ({ name: g.name, cards: g.cards })) };
+    }
+    //"#main / #extra / !side" list of one group, which editor.html and YgolDeck understand
+    function groupNamelist(g) {
+      let main = "#main\n", extra = "#extra\n";
+      for (const n of g.cards) {
+        if (isExtra(n)) extra += n + "\n";
+        else main += n + "\n";
+      }
+      return main + extra + "!side\n";
+    }
+    function collectionNamelist() {
+      return (
+        `#collection ${state.name}\n\n` +
+        state.groups.map((g) => `#group ${g.name}\n${g.cards.join("\n")}${g.cards.length ? "\n" : ""}`).join("\n")
+      );
+    }
+    function hasKonamiID(name) {
+      return !!(cardMap.get(name) || {}).konamiID;
+    }
+    const missingFromIndex = (cards) => [...new Set(cards)].filter((n) => !codec.index.has(n));
+    //what an export would leave out or change, for the notes in the popup
+    function exportNotes(scope, fmt, g) {
+      const notes = [];
+      if (fmt == "ylcc" || fmt == "yld") {
+        const cards = scope == "all" ? state.groups.flatMap((x) => x.cards) : g.cards;
+        const n = missingFromIndex(cards).length;
+        if (n) notes.push(`${n} ${n == 1 ? "card is" : "cards are"} not in the card index and will be left out.`);
+      }
+      if (scope == "one" && (fmt == "ydk" || fmt == "ydke")) {
+        const n = g.cards.filter((c) => !hasKonamiID(c)).length;
+        if (n) notes.push(`${n} ${n == 1 ? "card has" : "cards have"} no Konami ID and will be left out.`);
+      }
+      if (scope == "one") {
+        const many = [...new Set(g.cards)].filter((c) => countOf(g, c) > 3).length;
+        if (many) notes.push(`${many} ${many == 1 ? "card has" : "cards have"} more than 3 copies; editor.html keeps 3 when it opens this.`);
+      }
+      return notes;
+    }
+    function exportText(scope, fmt) {
+      const g = activeGroup();
+      codec.missing = [];
+      if (scope == "all") {
+        if (fmt == "ylcc") return { text: codec.encode(collectionData()), ext: ".ylcc", skipped: codec.missing.slice(), file: sanitizeFile(state.name, DEFAULT_COLLECTION) };
+        return { text: collectionNamelist(), ext: ".txt", skipped: [], file: sanitizeFile(state.name, DEFAULT_COLLECTION) };
+      }
+      let list = groupNamelist(g);
+      const file = sanitizeFile(g.name, DEFAULT_GROUP);
+      if (fmt == "ydk" || fmt == "ydke") {
+        const skip = new Set(g.cards.filter((c) => !hasKonamiID(c)));
+        list = list.split("\n").filter((a) => !skip.has(a)).join("\n");
+      }
+      if (fmt == "names") return { text: groupNamelist(g), ext: ".txt", skipped: [], file };
+      const skipped = fmt == "yld" ? missingFromIndex(g.cards) : [];
+      const text = ygolDeck.convert(list, fmt);
+      return { text, ext: fmt == "ydke" ? ".txt" : "." + fmt, skipped, file };
+    }
+    function openExport(action, scope = "all") {
+      if (!dataReady) return;
+      const g = activeGroup();
+      if (scope == "one" && !g) scope = "all";
+      const formats =
+        scope == "all"
+          ? [
+              { id: "ylcc", label: "YLCC", desc: "YGO Lightning card collection code. Keeps every group, its name, the collection name and the order of the cards." },
+              { id: "names", label: "Card names", desc: "Every group as a #group line followed by one card name per line." },
+            ]
+          : [
+              { id: "yld", label: "YLD", desc: "YGO Lightning deck code, for editor.html." },
+              { id: "ydke", label: "YDKE", desc: "Deck code for YGOPro-based simulators." },
+              { id: "ydk", label: "YDK", desc: "Deck file for YGOPro-based simulators." },
+              { id: "names", label: "Card names", desc: "One card name per line, in sections." },
+            ];
+      const verb = action == "copy" ? "Copy" : "Download";
+      openPopup({
+        title: `${verb} as`,
+        seg: [
+          { label: `Whole collection · ${state.groups.length} ${state.groups.length == 1 ? "group" : "groups"}`, selected: scope == "all", onSelect: () => openExport(action, "all") },
+          { label: g ? `Open group · ${g.name.length > 18 ? g.name.slice(0, 17) + "…" : g.name}` : "Open group", selected: scope == "one", disabled: !g, onSelect: () => openExport(action, "one") },
+        ],
+        choices: formats.map((f, i) => ({
+          label: f.label,
+          desc: f.desc,
+          notes: state.groups.length || scope == "all" ? exportNotes(scope, f.id, g) : [],
+          selected: i == 0,
+          onSelect: () => (action == "copy" ? copyAs(scope, f) : downloadAs(scope, f)),
+        })),
+      });
+    }
+    function reportSkipped(skipped) {
+      if (!skipped.length) return;
+      const counts = {};
+      for (const n of skipped) counts[n] = (counts[n] || 0) + 1;
+      let lines = Object.entries(counts).map(([n, c]) => `- ${n}${c > 1 ? ` x${c}` : ""}`);
+      if (lines.length > 20) lines = lines.slice(0, 20).concat(`...and ${lines.length - 20} more`);
+      alert(`${skipped.length} card(s) are not in the card index, so they were left out of the code:\n${lines.join("\n")}`);
+    }
+    async function copyAs(scope, f) {
+      let r;
+      try {
+        r = exportText(scope, f.id);
+      } catch (e) {
+        return alert("Error: This could not be exported.");
+      }
+      let ok = false;
+      try {
+        await navigator.clipboard.writeText(r.text);
+        ok = true;
+      } catch (e) {
+        const input = document.createElement("textarea");
+        input.value = r.text;
+        document.body.appendChild(input);
+        input.select();
+        ok = document.execCommand("copy");
+        document.body.removeChild(input);
+      }
+      const btn = $("copyDeck");
+      btn.textContent = ok ? `Copied ${f.label}!` : "Copy failed";
+      setTimeout(() => (btn.textContent = "Copy"), 2000);
+      reportSkipped(r.skipped);
+    }
+    function downloadAs(scope, f) {
+      let r;
+      try {
+        r = exportText(scope, f.id);
+      } catch (e) {
+        return alert("Error: This could not be exported.");
+      }
+      const a = document.createElement("a");
+      a.href = URL.createObjectURL(new Blob([r.text], { type: "text/plain" }));
+      a.download = r.file + r.ext;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      setTimeout(() => URL.revokeObjectURL(a.href), 1000);
+      reportSkipped(r.skipped);
+    }
+    $("copyDeck").addEventListener("click", () => openExport("copy"));
+    $("download").addEventListener("click", () => openExport("download"));
+
+    //--- import ---
+    $("upload").addEventListener("click", () => {
+      if (!dataReady) return;
+      openPopup({
+        title: "Upload from",
+        choices: [
+          { label: "File", desc: ".ylcc, .yld, .ydk or .txt", onSelect: () => $("uploadInput").click() },
+          { label: "Clipboard", onSelect: uploadFromClipboard },
+        ],
+      });
+    });
+    $("uploadInput").addEventListener("change", (e) => {
+      const input = e.target;
+      const file = input.files[0];
+      input.value = "";
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = () => importText(reader.result, file.name.replace(/\.(ylcc|yld|ydk|ydke|txt)$/i, ""), "file");
+      reader.readAsText(file);
+    });
+    async function uploadFromClipboard() {
+      let text = null;
+      try {
+        text = await navigator.clipboard.readText();
+      } catch (e) {
+        //the browser blocked reading the clipboard (not https, or permission refused)
+      }
+      if (text === null) return openPasteBox();
+      if (!text.trim()) return alert("The clipboard is empty.");
+      importText(text, null, "clipboard");
+    }
+    function openPasteBox() {
+      $("exportTitle").textContent = "Paste code";
+      const root = $("exportOptions");
+      root.innerHTML = "";
+      const hint = document.createElement("p");
+      hint.className = "export-hint";
+      hint.textContent = "Your browser didn't allow reading the clipboard. Paste the code here (Ctrl+V), then press Load.";
+      const box = document.createElement("textarea");
+      box.setAttribute("aria-label", "Collection code, deck code or card list");
+      const load = document.createElement("button");
+      load.type = "button";
+      load.className = "export-option";
+      load.textContent = "Load";
+      load.addEventListener("click", () => {
+        if (!box.value.trim()) return box.focus();
+        closePopup();
+        importText(box.value, null, "clipboard");
+      });
+      root.append(hint, box, load);
+      layer.classList.add("open");
+      box.focus();
+    }
+    //which kind of text this is
+    function detectKind(text) {
+      if (/ylcc:\/\//.test(text)) return "ylcc";
+      if (/^#(collection|group)\b/m.test(text)) return "names";
+      return "deck";
+    }
+    //a "#collection / #group" card name list
+    function parseNames(text) {
+      const col = { name: "", groups: [] };
+      const missing = [];
+      let cur = null;
+      for (const raw of text.split("\n")) {
+        const line = raw.trim();
+        if (!line) continue;
+        if (/^#collection\b/.test(line)) col.name = line.slice(11).trim();
+        else if (/^#group\b/.test(line)) {
+          cur = { name: line.slice(6).trim() || DEFAULT_GROUP, cards: [] };
+          col.groups.push(cur);
+        } else {
+          if (!cur) {
+            cur = { name: "Imported cards", cards: [] };
+            col.groups.push(cur);
+          }
+          if (cardMap.has(line)) cur.cards.push(line);
+          else missing.push(line);
+        }
+      }
+      return { col, missing };
+    }
+    //one deck (yld, ydk, ydke, dlf2p code or card names): all its cards, side deck included
+    function parseDeck(text) {
+      ygolDeck.missing = [];
+      const lines = text.split("\n").map((l) => l.trim()).filter(Boolean);
+      //a plain list of card names (no codes, no sections)
+      const namelist = lines.every((l) => cardMap.has(l)) ? lines.join("\n") : ygolDeck.convert(text, "namelist");
+      if (typeof namelist != "string") throw new Error("unreadable");
+      const cards = [];
+      const missing = ygolDeck.missing.slice();
+      for (const raw of namelist.split("\n")) {
+        const line = raw.trim();
+        if (!line || line[0] == "#" || line[0] == "!") continue;
+        if (cardMap.has(line)) cards.push(line);
+        else missing.push(line);
+      }
+      if (!cards.length) throw new Error("no cards");
+      return { cards, missing };
+    }
+    function importText(raw, fileName, source) {
+      const text = raw.replace(/\r\n?/g, "\n").trim();
+      const fail = (msg) =>
+        alert(msg || (source == "clipboard" ? "Error: The clipboard doesn't contain a code or card list this page can read." : "Error: This file isn't one this page can read."));
+      if (!text) return fail();
+      try {
+        const kind = detectKind(text);
+        if (kind == "ylcc") {
+          const code = text.match(/ylcc:\/\/[A-Za-z0-9\-_]+(\.[A-Za-z0-9\-_]*)?/)[0];
+          const col = codec.decode(code);
+          return askImportCollection(col, codec.missing.slice(), fileName);
+        }
+        if (kind == "names") {
+          const { col, missing } = parseNames(text);
+          if (!col.groups.some((g) => g.cards.length) && missing.length) throw new Error("no cards");
+          return askImportCollection(col, missing, fileName);
+        }
+        const { cards, missing } = parseDeck(text);
+        return askImportDeck(cards, missing, fileName || "Imported deck");
+      } catch (e) {
+        fail(/newer version/.test(e.message) ? "Error: " + e.message : null);
+      }
+    }
+    function skippedNote(missing) {
+      return missing.length ? [`${missing.length} ${missing.length == 1 ? "card is" : "cards are"} not in the card database and will be skipped.`] : [];
+    }
+    function askImportCollection(col, missing, fileName) {
+      const n = col.groups.length;
+      const cards = col.groups.reduce((s, g) => s + g.cards.length, 0);
+      const have = state.groups.length;
+      openPopup({
+        title: `Import ${n} ${n == 1 ? "group" : "groups"}?`,
+        hint: `${col.name ? `“${esc(col.name)}” has` : "This code has"} <b>${n} ${n == 1 ? "group" : "groups"}</b> and <b>${cards}</b> cards.`,
+        list: col.groups.map((g) => [g.name, g.cards.length]),
+        choices: [
+          {
+            label: "Add to my collection",
+            desc: have ? `Keeps your ${have} ${have == 1 ? "group" : "groups"} and adds ${n == 1 ? "this one" : "these " + n}.` : "Adds the groups to your collection.",
+            notes: ["A group whose name is already used gets (2) added.", ...skippedNote(missing)],
+            selected: true,
+            onSelect: () => applyCollection(col, "add", missing),
+          },
+          {
+            label: "Replace my collection",
+            desc: "Removes your current groups first.",
+            notes: have ? [`Your ${have} ${have == 1 ? "group" : "groups"} (${totalCards()} cards) will be lost.`] : [],
+            onSelect: () => applyCollection(col, "replace", missing),
+          },
+          { label: "Cancel" },
+        ],
+      });
+    }
+    function applyCollection(col, mode, missing) {
+      if (mode == "replace") {
+        state.groups = [];
+        state.activeId = null;
+        state.name = cleanName(col.name, MAX_COLLECTION_NAME) || DEFAULT_COLLECTION;
+      }
+      let first = null;
+      for (const g of col.groups) {
+        const added = makeGroup(uniqueGroupName(cleanName(g.name, MAX_GROUP_NAME) || DEFAULT_GROUP), g.cards.slice());
+        state.groups.push(added);
+        first = first || added;
+      }
+      if (first) state.activeId = first.id;
+      $("collectionName").value = state.name;
+      $("groupFilter").value = "";
+      changed();
+      if (isPhone()) showScreen("groups");
+      reportMissing(missing);
+    }
+    function askImportDeck(cards, missing, name) {
+      const g = activeGroup();
+      const info = `<b>${cards.length}</b> ${cards.length == 1 ? "card" : "cards"} (${new Set(cards).size} different) in “${esc(name)}”.`;
+      openPopup({
+        title: "Import deck?",
+        hint: info,
+        choices: [
+          {
+            label: "Add as a new group",
+            desc: `A group named “${name}”.`,
+            notes: skippedNote(missing),
+            selected: true,
+            onSelect: () => {
+              const added = makeGroup(uniqueGroupName(cleanName(name, MAX_GROUP_NAME) || DEFAULT_GROUP), cards.slice());
+              state.groups.push(added);
+              state.activeId = added.id;
+              $("groupFilter").value = "";
+              changed();
+              reportMissing(missing);
+            },
+          },
+          ...(g
+            ? [
+                {
+                  label: "Add to the open group",
+                  desc: `The cards go into “${g.name}”.`,
+                  notes: skippedNote(missing),
+                  onSelect: () => {
+                    g.cards.push(...cards);
+                    changed();
+                    reportMissing(missing);
+                  },
+                },
+              ]
+            : []),
+          { label: "Cancel" },
+        ],
+      });
+    }
+    function reportMissing(missing) {
+      if (!missing.length) return;
+      const counts = {};
+      for (const n of missing) counts[n] = (counts[n] || 0) + 1;
+      let lines = Object.entries(counts).map(([n, c]) => `- ${n}${c > 1 ? ` x${c}` : ""}`);
+      if (lines.length > 20) lines = lines.slice(0, 20).concat(`...and ${lines.length - 20} more`);
+      alert(`${missing.length} card(s) are not in the card database and were skipped:\n${lines.join("\n")}`);
+    }
+
+    //=== saving in the browser ===
+    let saveTimer = null;
+    function saveSoon() {
+      clearTimeout(saveTimer);
+      saveTimer = setTimeout(saveNow, 300);
+    }
+    function saveNow() {
+      clearTimeout(saveTimer);
+      if (!dataReady) return;
+      try {
+        const data = {
+          v: 1,
+          name: state.name,
+          stacked: state.stacked,
+          active: state.groups.findIndex((g) => g.id === state.activeId),
+          groups: state.groups.map((g) => {
+            const runs = []; //[name, copies] for neighbours that are the same card
+            for (const n of g.cards) {
+              const last = runs[runs.length - 1];
+              if (last && last[0] === n) last[1]++;
+              else runs.push([n, 1]);
+            }
+            return { name: g.name, cards: runs };
+          }),
+        };
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+      } catch (e) {
+        //storage blocked or full: the page still works, it just won't remember
+      }
+    }
+    window.addEventListener("pagehide", saveNow);
+    function loadSaved() {
+      try {
+        const data = JSON.parse(localStorage.getItem(STORAGE_KEY) || "null");
+        if (!data || data.v != 1 || !Array.isArray(data.groups)) return;
+        state.name = cleanName(data.name || "", MAX_COLLECTION_NAME) || DEFAULT_COLLECTION;
+        state.stacked = data.stacked !== false;
+        state.groups = data.groups.map((g) =>
+          makeGroup(
+            cleanName(g.name || "", MAX_GROUP_NAME) || DEFAULT_GROUP,
+            (g.cards || []).flatMap(([n, c]) => (cardMap.has(n) ? Array(Math.max(0, Math.floor(c))).fill(n) : []))
+          )
+        );
+        const a = state.groups[data.active];
+        state.activeId = a ? a.id : state.groups.length ? state.groups[0].id : null;
+      } catch (e) {
+        //unreadable saved data: start empty
+      }
+    }
+
+    //=== start ===
+    function addScript(src) {
+      return new Promise((resolve, reject) => {
+        const s = document.createElement("script");
+        s.src = src;
+        s.onload = resolve;
+        s.onerror = () => reject(new Error("Could not load " + src));
+        document.head.appendChild(s);
+      });
+    }
+    async function start() {
+      setMode("view");
+      $("collectionName").value = state.name;
+      renderAll();
+      $("searchResult").innerHTML = `<div class="emptynote">Loading card data...</div>`;
+      try {
+        await Promise.all(["data/ygolDb.js", "data/ygolID.js"].map(addScript));
+      } catch (e) {
+        $("groupCards").innerHTML = `<div class="emptynote">${esc(e.message)}.<br>Keep this page in the same folder as editor.html.</div>`;
+        return;
+      }
+      for (const c of cardDb) if (!cardMap.has(c.name)) cardMap.set(c.name, c);
+      searchIndex = cardDb.map((c) => (c.name + "\n" + c.description).toLowerCase());
+      ygolDeck = new YgolDeck(cardDb, ygolID, false);
+      codec = new YgolCollection(ygolID, (n) => cardMap.has(n));
+      dataReady = true;
+      loadSaved();
+      $("collectionName").value = state.name;
+      renderAll();
+      runSearch();
+      //a collection or deck in the page address: ?ylcc=<code> or ?yld=<code>
+      const params = new URL(window.location.href).searchParams;
+      const code = params.get("ylcc") ? "ylcc://" + params.get("ylcc") : params.get("yld") ? "yld://" + params.get("yld") : null;
+      if (code) {
+        history.replaceState(null, "", window.location.pathname);
+        importText(code, null, "clipboard");
+      }
+    }
+    start();
+  </script>
+  <script src="data/ygol-nav.js"></script>
+</html>
