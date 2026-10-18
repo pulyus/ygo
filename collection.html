@@ -2127,6 +2127,8 @@
       const n = col.groups.length;
       const cards = col.groups.reduce((s, g) => s + g.cards.length, 0);
       const have = state.groups.length;
+      //nothing on the page to keep: replace straight away instead of asking
+      if (!have) return applyCollection(col, "replace", missing);
       openPopup({
         title: `Import ${n} ${n == 1 ? "group" : "groups"}?`,
         hint: `${col.name ? `“${esc(col.name)}” has` : "This code has"} <b>${n} ${n == 1 ? "group" : "groups"}</b> and <b>${cards}</b> cards.`,
