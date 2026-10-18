@@ -8,7 +8,7 @@
       content="Card collection manager: keep any number of named groups of cards, with any number of copies, and save the whole collection as one code."
     />
     <link rel="icon" type="image/x-icon" href="images/logo.png" />
-    <title>DLF2P Collection</title>
+    <title>Card Collection</title>
     <style>
       /* ===== colour scheme "Indigo": the same as editor.html, plus the few additions marked NEW ===== */
       :root {
@@ -1182,7 +1182,13 @@
         }
       }
     }
+    //browser tab title: the collection's name once it has one, else "Card Collection"
+    function updateTitle() {
+      const name = state.name.trim();
+      document.title = name && name != DEFAULT_COLLECTION ? name : "Card Collection";
+    }
     function renderAll() {
+      updateTitle();
       renderGroupList();
       renderGroupCards();
       refreshOwned();
@@ -1479,11 +1485,13 @@
     });
     $("collectionName").addEventListener("input", (e) => {
       state.name = cleanName(e.target.value, MAX_COLLECTION_NAME);
+      updateTitle();
       saveSoon();
     });
     $("collectionName").addEventListener("blur", (e) => {
       state.name = cleanName(e.target.value, MAX_COLLECTION_NAME).trim() || DEFAULT_COLLECTION;
       e.target.value = state.name;
+      updateTitle();
       saveSoon();
     });
     $("groupName").addEventListener("input", (e) => {
@@ -2146,6 +2154,9 @@
         state.groups = [];
         state.activeId = null;
         state.name = cleanName(col.name, MAX_COLLECTION_NAME) || DEFAULT_COLLECTION;
+      } else if ((!state.name.trim() || state.name == DEFAULT_COLLECTION) && cleanName(col.name, MAX_COLLECTION_NAME).trim()) {
+        //adding to a collection that has no name yet: it takes the uploaded collection's name
+        state.name = cleanName(col.name, MAX_COLLECTION_NAME).trim();
       }
       let first = null;
       for (const g of col.groups) {
