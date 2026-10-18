@@ -1879,9 +1879,17 @@
     }
     const missingFromIndex = (cards) => [...new Set(cards)].filter((n) => !codec.index.has(n));
     //what an export would leave out or change, for the notes in the popup
+    //this page's address with ?ylcc=<code> (the code only uses URL-safe characters)
+    function collectionLink(code) {
+      return window.location.href.split(/[?#]/)[0] + "?ylcc=" + code;
+    }
     function exportNotes(scope, fmt, g) {
       const notes = [];
-      if (fmt == "ylcc" || fmt == "yld") {
+      if (fmt == "link") {
+        const len = collectionLink(codec.encode(collectionData()).slice(YgolCollection.PREFIX.length)).length;
+        if (len > 2000) notes.push(`Long link (${len.toLocaleString()} characters): some apps and sites may cut it short.`);
+      }
+      if (fmt == "ylcc" || fmt == "yld" || fmt == "link") {
         const cards = scope == "all" ? state.groups.flatMap((x) => x.cards) : g.cards;
         const n = missingFromIndex(cards).length;
         if (n) notes.push(`${n} ${n == 1 ? "card is" : "cards are"} not in the card index and will be left out.`);
@@ -1901,6 +1909,10 @@
       codec.missing = [];
       if (scope == "all") {
         if (fmt == "ylcc") return { text: codec.encode(collectionData()), ext: ".ylcc", skipped: codec.missing.slice(), file: sanitizeFile(state.name, DEFAULT_COLLECTION) };
+        if (fmt == "link") {
+          const code = codec.encode(collectionData()).slice(YgolCollection.PREFIX.length);
+          return { text: collectionLink(code), ext: ".txt", skipped: codec.missing.slice(), file: sanitizeFile(state.name, DEFAULT_COLLECTION) };
+        }
         return { text: collectionNamelist(), ext: ".txt", skipped: [], file: sanitizeFile(state.name, DEFAULT_COLLECTION) };
       }
       let list = groupNamelist(g);
@@ -1922,6 +1934,9 @@
         scope == "all"
           ? [
               { id: "ylcc", label: "YLCC", desc: "YGO Lightning card collection code. Keeps every group, its name, the collection name and the order of the cards." },
+              ...(action == "copy"
+                ? [{ id: "link", label: "Link", desc: "The address of this page with the collection in it. Opening it loads the collection." }]
+                : []),
               { id: "names", label: "Card names", desc: "Every group as a #group line followed by one card name per line." },
             ]
           : [
